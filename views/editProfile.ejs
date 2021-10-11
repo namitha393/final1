@@ -1,0 +1,51 @@
+
+<%- include('partials/header') %>
+<html lang="en" dir="ltr" style="
+    margin-top: 40px;
+    margin-right: 300px;
+">
+<div class="container">
+    <div class="main-body">
+        <div class="row">
+            <div class="col-lg-4">
+            </div>
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-body">
+                        <form class="" method="post" action="/user/editProfile">
+                         <div class="form-group">
+                                <label for="name">Name</label>
+                                <input type="text" class="form-control" name="name" value=<%=name%> required>
+                        </div>
+                        <div class="form-group">
+                                <label for="username">Username</label>
+                                <input type="text" class="form-control" name="username" value=<%=username%> required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="text" class="form-control" name="email" value=<%=email%> required>
+                        </div>
+                        <div class="form-group">
+                            <label for="oldpassword">Old password</label>
+                            <input type="password" class="form-control" name="oldpassword">
+                        </div>
+                        <div class="form-group">
+                            <label for="newpassword">New password</label>
+                            <input type="password" class="form-control" name="newpassword">
+                        </div>
+                        <div class="form-group">
+                            <label for="confirmpassword">Confirm password</label>
+                            <input type="password" class="form-control" name="confirmpassword">
+                        </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-3"></div>
+                            <button type="submit" class="btn btn-primary px-4">Save changes</button>
+                        </div>
+                       
+                    </form>
+                    </div>
+            </div>
+        </div>
+    </div>
+</div>
