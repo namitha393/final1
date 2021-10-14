@@ -1,0 +1,61 @@
+<%- include('../partials/header') %>
+
+<html lang="en" dir="ltr" style="
+    margin-top: 40px;
+    margin-right: 300px;
+">
+<div class="container">
+    <div class="main-body">
+        <div class="row">
+            <div class="col-lg-4">
+            </div>
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-body">
+                        <form class="" method="post" action=/instructor/create>
+                         <div class="form-group">
+                                <label for="name">Course Name</label>
+                                <input type="text" class="form-control" name="name" required>
+                        </div>
+                        <div class="form-group">
+                                <label for="courseCode">Course Code</label>
+                                <input type="text" class="form-control" name="courseCode" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="sem">Semester</label>
+                            <input type="text" class="form-control" name="sem"  required>
+                        </div>
+                        <div class="form-group">
+                            <label for="iaccesscode">Access Code for the instructors</label>
+                            <div class="col-sm-9 text-secondary">
+                                <%=i_code%>
+                              </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="saccesscode">Access Code for the students</label>
+                            <div class="col-sm-9 text-secondary">
+                                <%=s_code%>
+                              </div>
+                        </div>
+                        <div class="row" style="margin-left: 160px">
+                            <div class="col-sm-3"></div>
+                            <button type="submit" class="btn btn-primary px-4">Submit</button>
+                        </div>
+                    </form>
+                    </div>
+                
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+
+
+
+
+
+
+
+
+<%- include('../partials/footer') %>

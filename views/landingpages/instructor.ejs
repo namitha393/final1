@@ -1,0 +1,58 @@
+<%- include('../partials/header') %>
+
+
+  <div class="container" style="margin-left: 1100px">
+    <div class="btn-group">
+      <a href="/instructor/join">
+        <button type="button" class="btn btn-outline-secondary" style="margin-right: 20px;" >Join a course</button>
+        </a>
+      <a href="/instructor/create">
+        <button type="button" class="btn btn-outline-secondary" style="margin-right: 20px;" >Create a course</button>
+        </a>
+      <div class="dropdown">
+        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="margin-right: 20px">
+          Instructor
+        </button>
+        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            <a class="dropdown-item" href="/student">Student</a>
+            <a class="dropdown-item" href="/instructor">Instructor</a>
+        </div>
+      </div>
+      <div class="dropdown">
+        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <%=_doc.name%>
+        </button>
+        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+          <a class="dropdown-item" href=/student/profile>Profile</a>
+          <a class="dropdown-item" href="/logout">Logout</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <% courses.forEach(course=>{ %>
+    <div class="media position-relative">
+      <img src="..." class="mr-3" alt="">
+      <div class="media-body">
+        <h5 class="mt-0"><%=course.name%></h5>
+        <p><%=course.courseCode%></p>
+        <a href=/student/courses/<%=course.name%> class="stretched-link">view</a>
+      </div>
+    </div>
+  <% }) %>
+
+
+
+
+<script>
+    window.addEventListener( "pageshow", function ( event ) {
+  var historyTraversal = event.persisted || 
+                         ( typeof window.performance != "undefined" && 
+                              window.performance.navigation.type === 2 );
+  if ( historyTraversal ) {
+    // Handle page restore.
+    window.location.reload();
+  }
+});
+</script>
+
+<%- include('../partials/footer') %>

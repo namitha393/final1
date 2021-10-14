@@ -62,7 +62,7 @@
                       <h6 class="mb-0">Name</h6>
                     </div>
                     <div class="col-sm-9 text-secondary">
-                      <%=name%>
+                      <%=_doc.name%>
                     </div>
                   </div>
                   <hr>
@@ -71,7 +71,7 @@
                       <h6 class="mb-0">Username</h6>
                     </div>
                     <div class="col-sm-9 text-secondary">
-                        <%=username%>
+                        <%=_doc.username%>
                     </div>
                   </div>
                   <hr>
@@ -80,13 +80,13 @@
                       <h6 class="mb-0">Email</h6>
                     </div>
                     <div class="col-sm-9 text-secondary">
-                      <%=email%>
+                      <%=_doc.email%>
                     </div>
                   </div>
                   <hr>
                   <div class="row">
                     <div class="col-sm-12">
-                      <a class="btn btn-info " target="__blank" href="/user/editProfile">Edit</a>
+                      <a class="btn btn-info " target="__blank" href=/<%=Role%>/editProfile>Edit</a>
                     </div>
                   </div>
                 </div>
