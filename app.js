@@ -13,14 +13,14 @@ var {Course}=require("./models/Course.js")
 //const {Schema} = mongoose;
 var _ = require('lodash');
 const { toInteger } = require("lodash");
-const e = require("express");
+
 // var registration = require('./controllers/register'); var User =
 
 
 const port = 3000;
 const app = express();
 app.set('view engine', 'ejs');
-app.set("views",[__dirname+"/views",__dirname+"/views/landingpages",__dirname+"/views/authentication",__dirname+"/views/courses"])
+app.set("views",[__dirname+"/views",__dirname+"/views/landingpages",__dirname+"/views/authentication",__dirname+"/views/courses",__dirname+"/views/profile"])
 
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
@@ -73,7 +73,7 @@ app.post("/register",(req, res) => {
   var newUser = new User({username: req.body.username, email: req.body.email, name: req.body.name, SCourses: [], ICourses: []});
   User.register(newUser, req.body.password, function (err, user) {
     if (err) {
-      console.log(err);
+      console.log(err);   
       res.redirect("/register");
     }
     passport.authenticate("local")(req, res, function () {
@@ -190,21 +190,122 @@ app.get("/instructor/create",(req,res)=>{
   res.render("createCourse",{i_code: i_code,s_code:s_code});
 })
 
-app.get("/student/join",(req,res)=>{
-  
+app.post("/:Role/join",(req,res)=>{
+  let role=req.params.Role,code=req.body.code;
+  if(role=="student"){
+    var q=Course.findOne({s_code:code});
+  }
+  else{
+    var q=Course.findOne({i_code:code});
+  }
+  q.exec((err,course)=>{
+    //console.log(course);
+    if(err){
+      console.log(err);
+    }    
+    else if(course==null){
+      return res.redirect("/"+role);
+    }
+    else{
+      var members=[];
+      Course.findById(course._id,(err,course2)=>{
+        if(role=="student"){
+          members=course.students;
+        }
+        else{
+          members=course.instructors;
+        }
+        members.push(req.user._id);
+        if(role=="student") Course.findByIdAndUpdate(course._id,{$set:{students: members}},(err)=>{if(err) console.log(err)});
+        else  Course.findByIdAndUpdate(course._id,{$set:{instructors: members}},(err)=>{if(err) console.log(err)});
+      })
+      User.findById(req.user._id,(err,user)=>{
+        if(err){
+          console.log(err);
+        }
+        else{
+          var courses=[];
+          if(role=="student"){
+            courses=user.SCourses;
+          }
+          else{
+            courses.user.ICourses;
+          }
+          courses.push(course._id);
+          if(role=="student") User.findByIdAndUpdate(user._id,{$set:{SCourses: courses}},(err)=>{if(err) console.log(err)});
+          else  User.findByIdAndUpdate(user._id,{$set:{ICourses: courses}},(err)=>{if(err) console.log(err)});
+        }
+      })
+    }
+    res.redirect("/"+role);
+  })
 })
 
 
 app.get("/:Role", (req,res)=>{
   //console.log(req.user);
-  var courses=[];
-  res.render(req.params.Role,{...(req.user),courses:courses});
+  var role=req.params.Role;
+  var courses=[],courseIds=[];
+  var q=User.findById(req.user._id);
+  q.exec((err,user)=>{
+    if(err){
+      console.log("ERR: ",err);
+    }
+    else if(role=="student"){
+      courseIds=user.SCourses;
+      if(courseIds.length==0) {
+        //console.log(courses);
+        return res.render(role,{...(req.user),courses:courses});
+      }
+      courseIds.forEach(id=>{
+        let q2=Course.findById(id);
+        q2.exec((err,course)=>{
+          if(err){
+            console.log(err);
+          }
+          else if(course==null){
+            return res.render(role,{...(req.user),courses:courses})
+          }
+          else courses.push(course);
+          if(courses.length==courseIds.length) return res.render(role,{...(req.user),courses:courses});
+        })
+      })
+    }
+    else{
+      courseIds=user.ICourses;
+      //return res.render(role,{...(req.user),courses:courses});
+      if(courseIds.length==0) {
+        //console.log(courses);
+        return res.render(role,{...(req.user),courses:courses});
+      }
+      courseIds.forEach(id=>{
+        //console.log(id);
+        let q2=Course.findById(id);
+        q2.exec((err,course)=>{
+          if(err){
+            console.log(err);
+          }
+          else if(course==null){
+            return res.render(role,{...(req.user),courses:courses})
+          }
+          else {
+            courses.push(course);
+            //console.log(course);
+          }
+          if(courses.length==courseIds.length) return res.render(role,{...(req.user),courses:courses});
+        })
+      })
+    }
+  })
+
+  //console.log(courseIds);
+  
 })
 
 
 
 app.post("/instructor/create",async (req,res)=>{
- // console.log(req.body);
+  //console.log(req.body);
  //console.log(req.user);
   var newCourse=new Course({
     i_code: i_code,
@@ -213,12 +314,44 @@ app.post("/instructor/create",async (req,res)=>{
     courseCode: req.body.courseCode,
     students: [],
     sem: req.body.sem,
-    instructors: [req.user._id],
+    instructors: [req.user._id]
+  })
+  newCourse.save((err)=>{
+    if(err) {
+      console.log("error: ");
+      console.log(err);
+    }
+    else{
+      res.redirect("/instructor");
+    }
+  });
+  courses=[];
+  var q=User.findById(req.user.id);
+  q.exec((err,user)=>{
+    if(user.ICourses.length!=0) courses=user.ICourses;
+    courses.push(newCourse._id);
+    User.findByIdAndUpdate(req.user.id,{$set: {ICourses: courses}},(err)=>{
+      if(err) console.log(err);
+    });
   })
 
 })
 
-
+app.get("/:Role/courses/:courseName",(req,res)=>{
+  var q=Course.findOne({name:req.params.courseName});
+  q.exec((err,course)=>{
+    if(err){
+      console.log(err);
+    }
+    else if(course==null){
+      res.redirect("/"+req.params.Role);
+    }
+    else{
+      res.render("course_"+req.params.Role,{course: course});
+    }
+  })
+  
+})
 
 
 app.listen(port, function () {

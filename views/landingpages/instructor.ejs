@@ -1,7 +1,7 @@
 <%- include('../partials/header') %>
 
 
-  <div class="container" style="margin-left: 1100px">
+  <div class="container" style="padding-left: 750px">
     <div class="btn-group">
       <a href="/instructor/join">
         <button type="button" class="btn btn-outline-secondary" style="margin-right: 20px;" >Join a course</button>
@@ -29,30 +29,23 @@
       </div>
     </div>
   </div>
+  <br>
+  <div style="padding-left:400px">
   <% courses.forEach(course=>{ %>
-    <div class="media position-relative">
-      <img src="..." class="mr-3" alt="">
-      <div class="media-body">
-        <h5 class="mt-0"><%=course.name%></h5>
-        <p><%=course.courseCode%></p>
-        <a href=/student/courses/<%=course.name%> class="stretched-link">view</a>
+
+    <div class="card" style="width: 50rem;">
+      <!-- <img src="..." class="card-img-top" alt="..."> -->
+      <div class="card-body">
+        <h5 class="card-title"><%=course.name%></h5>
+        <p class="card-text"><%=course.courseCode%>-<%=course.sem%></p>
+    
+        <a href=/student/courses/<%=course.name%> class="btn btn-primary stretched-link">View</a>
       </div>
     </div>
   <% }) %>
+</div>
 
 
 
-
-<script>
-    window.addEventListener( "pageshow", function ( event ) {
-  var historyTraversal = event.persisted || 
-                         ( typeof window.performance != "undefined" && 
-                              window.performance.navigation.type === 2 );
-  if ( historyTraversal ) {
-    // Handle page restore.
-    window.location.reload();
-  }
-});
-</script>
 
 <%- include('../partials/footer') %>

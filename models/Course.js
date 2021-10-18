@@ -11,11 +11,11 @@ var CourseSchema = new Schema(
   {
       i_code: Number,
       s_code: Number,
-      name: String,
-      courseCode: String,
-      students:[String],
-      instructors: [String],
-      sem: String
+      name:  {type: String,unique: false},
+      courseCode:  {type: String,unique: false},
+      students: {type: [String],unique: false},
+      instructors:  {type: [String],unique: false},
+      sem:  {type: String,unique: false}
   }
 )
 
