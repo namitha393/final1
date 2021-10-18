@@ -10,6 +10,9 @@ var passport = require('passport');
 //const passportLocalMongoose = require('passport-local-mongoose');
 var {User}=require("./models/User.js")
 var {Course}=require("./models/Course.js")
+const path = require("path");
+const multer = require("multer");
+const File = require("./models/File.js");
 //const {Schema} = mongoose;
 var _ = require('lodash');
 const { toInteger } = require("lodash");
@@ -29,6 +32,20 @@ app.use(session({secret: "aSecretToComputeTheHash", resave: false, saveUninitial
 app.use(passport.initialize());
 app.use(passport.session());
 
+const multerStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "public");
+  },
+  filename: (req, file, cb) => {
+    const ext = file.mimetype.split("/")[1];
+    cb(null, `files/admin-${file.fieldname}-${Date.now()}.${ext}`);
+  },
+});
+
+const upload = multer({
+  storage: multerStorage,
+//  fileFilter: multerFilter,
+});
 //mongoose.connect("mongodb://localhost:27017/MoodleDB", {useNewUrlParser: true});
 
 // var UserSchema = new Schema(
@@ -316,6 +333,7 @@ app.post("/instructor/create",async (req,res)=>{
     sem: req.body.sem,
     instructors: [req.user._id]
   })
+  //var c=[];
   newCourse.save((err)=>{
     if(err) {
       console.log("error: ");
@@ -327,6 +345,7 @@ app.post("/instructor/create",async (req,res)=>{
   });
   courses=[];
   var q=User.findById(req.user.id);
+
   q.exec((err,user)=>{
     if(user.ICourses.length!=0) courses=user.ICourses;
     courses.push(newCourse._id);
@@ -337,22 +356,50 @@ app.post("/instructor/create",async (req,res)=>{
 
 })
 
-app.get("/:Role/courses/:courseName",(req,res)=>{
+app.get("/student/courses/:courseName",async (req,res)=>{
   var q=Course.findOne({name:req.params.courseName});
-  q.exec((err,course)=>{
+  q.exec(async (err,course)=>{
     if(err){
       console.log(err);
     }
     else if(course==null){
-      res.redirect("/"+req.params.Role);
+      res.redirect("/student");
     }
     else{
-      res.render("course_"+req.params.Role,{course: course});
+      res.render("course_student",{course: course});
     }
   })
-  
 })
-
+app.get("/instructor/courses/:courseName",async (req,res)=>{
+  var q=Course.findOne({name:req.params.courseName});
+  q.exec(async (err,course)=>{
+    if(err){
+      console.log(err);
+    }
+    else if(course==null){
+      res.redirect("/instructor");
+    }
+    else{
+      res.render("course_instructor",{course: course});
+    }
+  })
+})
+app.post("/instructor/courses/:courseName", upload.single("myFile"), async (req, res) => {
+  //console.log(req.file);
+  try {
+    const newFile = await File.create({
+      name: req.file.filename,
+    });
+    res.status(200).json({
+      status: "success",
+      message: "File created successfully!!",
+    });
+  } catch (error) {
+    res.json({
+      error,
+    });
+  }
+});
 
 app.listen(port, function () {
   console.log("Server started on port 3000.");

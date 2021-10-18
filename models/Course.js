@@ -5,7 +5,11 @@ const passportLocalMongoose = require('passport-local-mongoose');
 const {Schema} = mongoose;
 
 
-mongoose.connect("mongodb://localhost:27017/MoodleDB", {useNewUrlParser: true});
+mongoose.connect("mongodb://localhost:27017/MoodleDB", {
+  useNewUrlParser: true,
+
+});
+
 
 var CourseSchema = new Schema(
   {
