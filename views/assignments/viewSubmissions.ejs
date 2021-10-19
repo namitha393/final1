@@ -1,0 +1,49 @@
+<%- include('../partials/header') %>
+
+<html lang="en" dir="ltr" style="
+    margin-top: 40px;
+    margin-right: 300px;
+    text-align: center;
+">
+
+
+<br>
+<br>
+<br>
+<div class="container">
+    <div class="main-body">
+        <div class="row">
+            <div class="col-lg-4">
+            </div>
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-body">
+                        <div >
+                            <% subs.forEach(sub=>{ %>
+                                <div class="form-group">
+                                    <label for="name"><%=sub.studentName%>: </label>
+                                    <a href=/download/submissions/<%=sub._id%>><%=sub.FileName%></a>
+                                </div>
+                            <% }) %>
+                          </div>
+                          
+</div>
+</div>
+                
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+<%- include('../partials/footer') %>

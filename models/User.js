@@ -17,6 +17,7 @@ var UserSchema = new Schema(
     email: String,
     SCourses: [String],
     ICourses: [String],
+    submissions: [String]
   }
 )
 UserSchema.plugin(passportLocalMongoose, {selectFields: "username name email SCourses ICourses"});

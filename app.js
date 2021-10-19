@@ -12,18 +12,20 @@ var {User}=require("./models/User.js")
 var {Course}=require("./models/Course.js")
 const path = require("path");
 const multer = require("multer");
-const File = require("./models/File.js");
+const Assignement = require("./models/Assignement.js");
 //const {Schema} = mongoose;
 var _ = require('lodash');
 const { toInteger } = require("lodash");
-
+const { off } = require("process");
+const Assignment = require("./models/Assignement.js");
+const Submission = require("./models/Submission.js");
 // var registration = require('./controllers/register'); var User =
 
 
 const port = 3000;
 const app = express();
 app.set('view engine', 'ejs');
-app.set("views",[__dirname+"/views",__dirname+"/views/landingpages",__dirname+"/views/authentication",__dirname+"/views/courses",__dirname+"/views/profile"])
+app.set("views",[__dirname+"/views",__dirname+"/views/landingpages",__dirname+"/views/authentication",__dirname+"/views/courses",__dirname+"/views/profile",__dirname+"/views/assignments"])
 
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
@@ -106,7 +108,7 @@ app.get("/login", (req, res) => {
 })
 
 app.post('/login', passport.authenticate('local', {
-  successRedirect: "/student",
+  successRedirect: "/student", //student instructor
   failureRedirect: '/login'
 }));
 
@@ -260,6 +262,7 @@ app.post("/:Role/join",(req,res)=>{
 
 
 app.get("/:Role", (req,res)=>{
+  if(req.params.Role!="student"&&req.params.Role!="instructor") return;
   //console.log(req.user);
   var role=req.params.Role;
   var courses=[],courseIds=[];
@@ -275,6 +278,7 @@ app.get("/:Role", (req,res)=>{
         return res.render(role,{...(req.user),courses:courses});
       }
       courseIds.forEach(id=>{
+        
         let q2=Course.findById(id);
         q2.exec((err,course)=>{
           if(err){
@@ -343,13 +347,13 @@ app.post("/instructor/create",async (req,res)=>{
       res.redirect("/instructor");
     }
   });
-  courses=[];
-  var q=User.findById(req.user.id);
+  var courses=[];
+  var q=User.findById(req.user._id);
 
   q.exec((err,user)=>{
     if(user.ICourses.length!=0) courses=user.ICourses;
     courses.push(newCourse._id);
-    User.findByIdAndUpdate(req.user.id,{$set: {ICourses: courses}},(err)=>{
+    User.findByIdAndUpdate(req.user._id,{$set: {ICourses: courses}},(err)=>{
       if(err) console.log(err);
     });
   })
@@ -366,7 +370,20 @@ app.get("/student/courses/:courseName",async (req,res)=>{
       res.redirect("/student");
     }
     else{
-      res.render("course_student",{course: course});
+      assIds=course.assignments;
+      var ass=[];
+      if(assIds.length==0){
+        return res.render("course_student",{ass:ass,course:course})
+      }
+      assIds.forEach(id=>{
+        Assignment.findById(id,(err,ass1)=>{
+          ass.push(ass1); 
+          if(ass.length==assIds.length){
+            return res.render("course_student",{ass:ass,course:course});
+          }
+        })
+      })
+      //res.render("course_instructor",{course: course});
     }
   })
 })
@@ -380,27 +397,145 @@ app.get("/instructor/courses/:courseName",async (req,res)=>{
       res.redirect("/instructor");
     }
     else{
-      res.render("course_instructor",{course: course});
+      assIds=course.assignments;
+      var ass=[];
+      if(assIds.length==0){
+        return res.render("course_instructor",{ass:ass,course:course})
+      }
+      assIds.forEach(id=>{
+        Assignment.findById(id,(err,ass1)=>{
+          ass.push(ass1); 
+          if(ass.length==assIds.length){
+            return res.render("course_instructor",{ass:ass,course:course});
+          }
+        })
+      })
+      //res.render("course_instructor",{course: course});
     }
   })
 })
-app.post("/instructor/courses/:courseName", upload.single("myFile"), async (req, res) => {
-  //console.log(req.file);
+app.get("/instructor/courses/:courseName/createAssignment",(req,res)=>{
+  var q=Course.findOne({name:req.params.courseName});
+  q.exec(async (err,course)=>{
+    if(err){
+      console.log(err);
+    }
+    else if(course==null){
+      res.redirect("/instructor/courses/"+req.params.courseName);
+    }
+    else{
+      res.render("createAssignment",{course:course});
+    }
+  })
+  
+})
+app.post("/instructor/courses/:courseName/createAssignment", upload.single("myFile"), async (req, res) => {
+  //console.log(req.file.filename);
   try {
-    const newFile = await File.create({
+    const newFile = await Assignement.create({
       name: req.file.filename,
+      nameofA: req.body.nameofA,
+      desc: req.body.description,
+      deadline: req.body.deadline
     });
-    res.status(200).json({
-      status: "success",
-      message: "File created successfully!!",
-    });
+    var q=Course.findOne({name:req.params.courseName});
+    q.exec(async (err,course)=>{
+      var ass=course.assignments;
+      ass.push(newFile._id);
+      Course.findByIdAndUpdate(course._id,{$set:{assignments: ass}},(err)=>{if(err) console.log(err)});
+      res.redirect("/instructor/courses/"+req.params.courseName);
+    })
   } catch (error) {
     res.json({
       error,
     });
   }
 });
-
+app.get("/instructor/courses/:courseName/assignments/:assName",(req,res)=>{
+  Submission.find({courseName:req.params.courseName,assName:req.params.assName},(err,subs)=>{
+    if(err){
+      console.log(err);
+    }
+    else{
+      res.render("viewSubmissions",{subs:subs});
+    }
+  })
+})
+app.get("/student/courses/:courseName/assignments/:assName",(req,res)=>{
+  var q=Course.findOne({name:req.params.courseName});
+  q.exec(async (err,course)=>{
+    if(err){
+      console.log(err);
+    }
+    else if(course==null){
+      res.redirect("/student");
+    }
+    else{
+      Assignment.findOne({nameofA:req.params.assName},(err,ass)=>{
+        if(err){
+          console.log(err);
+        }
+        else if(ass==null){
+          res.redirect("/student");
+        }
+        else{
+          res.render("viewAndSubmit",{course:course,ass: ass});
+        }
+      })
+    }
+  })
+})
+app.post("/student/courses/:courseName/assignments/:assName",upload.single("myFile"),async (req,res)=>{
+  try {
+    const newSub=await Submission.create({
+      name: req.file.filename,
+      feedback: null,
+      grade: null,
+      courseName: req.params.courseName,
+      assName: req.params.assName,
+      studentName: req.user.name,
+      FileName: req.body.name
+    })
+    var q=User.findById(req.user._id);
+    q.exec(async (err,user)=>{
+      var subs=[];
+      subs=user.submissions;
+      subs.push(newSub._id);
+      User.findByIdAndUpdate(req.user._id,{$set:{submissions: subs}},(err)=>{if(err) console.log(err)});
+      res.redirect("/student/courses/"+req.params.courseName);
+    })
+  } catch (error) {
+    res.json({
+      error,
+    });
+  }
+})
+app.get('/download/assignment/:assName', function(req, res){
+  var assName=req.params.assName;
+  //res.send(req.params.f)
+  Assignment.findOne({nameofA:assName},(err,ass)=>{
+    if(err){
+      console.log(err);
+    }
+    else{
+      var filename=ass.name;
+      const file = `${__dirname}/public/`+filename;    
+      res.download(file);
+    }
+  })
+});
+app.get('/download/submissions/:subId', function(req, res){
+  Submission.findById(req.params.subId,(err,sub)=>{
+    if(err){
+      console.log(err);
+    }
+    else{
+      var filename=sub.name;
+      const file = `${__dirname}/public/`+filename;    
+      res.download(file);
+    }
+  })
+});
 app.listen(port, function () {
   console.log("Server started on port 3000.");
 });

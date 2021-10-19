@@ -1,17 +1,26 @@
 <%- include('../partials/header') %>
 
 
+<div class="container" style="padding-left: 950px">
+<a href=/instructor/courses/<%=course.name%>/createAssignment>
+  <button type="button" class="btn btn-outline-secondary" style="margin-top: 20px;" >Create an assignment</button>
+  </a>
+</div>
 
-<form action="/:Role/courses/:courseName" enctype="multipart/form-data" method="POST">
-    <input type="file" class="admin__input" id="myFile" name="myFile" />
-    <input class="admin__submit" type="submit" />
-  </form>
-
-
-
-
-
-
+<br>
+<div style="padding-left:400px">
+<% ass.forEach(ass1=>{ %>
+  <div class="card" style="width: 50rem;">
+    <!-- <img src="..." class="card-img-top" alt="..."> -->
+    <div class="card-body">
+      <h5 class="card-title"><%=ass1.nameofA%></h5>
+      <p class="card-text"><%=ass1.desc%></p>
+      <p class="card-text"><%=ass1.deadline%></p>
+      <a href=/instructor/courses/<%=course.name%>/assignments/<%=ass1.nameofA%> class="btn btn-primary stretched-link">View</a>
+    </div>
+  </div>
+<% }) %>
+</div>
 
 
 

@@ -1,0 +1,111 @@
+#include <bits/stdc++.h>
+
+using namespace std;
+
+#define F first
+#define S second
+
+int main()
+{
+    fstream f;
+    string filename = "inp.txt", s;
+    f.open(filename.c_str());
+    int n, m;
+    f >> n >> m;
+    vector<vector<int>> hor(n + 1, vector<int>(m));
+    vector<vector<int>> ver(n, vector<int>(m + 1));
+    int i = 0, j = 0;
+    while (!(i == n && j == m))
+    {
+        f >> s;
+        if (j == m)
+        {
+            j = 0;
+            i++;
+        }
+        hor[i][j] = stoi(s);
+        j++;
+    }
+    i = 0;
+    j = 0;
+    while (f >> s)
+    {
+        if (j == m + 1)
+        {
+            j = 0;
+            i++;
+        }
+        ver[i][j] = stoi(s);
+        j++;
+    }
+    map<pair<int,int>,vector<pair<int,int>>> adj;
+
+    vector<pair<int, int>> D = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}};
+    for (int i = 0; i < n; i++)
+    {
+        for (int j = 0; j < m; j++)
+        {
+            pair<int, int> p = make_pair(i, j);
+            for (auto z : D)
+            {
+                int x = p.F + z.F, y = p.S + z.S;
+                if (x < 0 || y < 0 || x >= n || y >= m)
+                    continue;
+                if (p.F == x)
+                {
+                    if (!ver[x][max(p.S, y)])
+                        adj[make_pair(i,j)].push_back(make_pair(x, y));
+                }
+                else
+                {
+                    if (!hor[max(p.F, x)][y])
+                        adj[make_pair(i,j)].push_back(make_pair(x, y));
+                }
+            }
+        }
+    }
+
+     pair<int, int> start = {0, 0};
+     queue<pair<int, int>> q;
+    map<pair<int, int>, int> used;
+    map<pair<int, int>, int> d;
+    map<pair<int, int>, pair<int, int>> p;
+    q.push(start);
+    used[start] = 1;
+    p[start] = {-1, -1};
+    while (!q.empty())
+    {
+        pair<int, int> v = q.front();
+        q.pop();
+        for (pair<int, int> u : adj[v])
+        {
+            if (!used[u])
+            {
+                used[u] = 1;
+                q.push(u);
+                d[u] = d[v] + 1;
+                p[u] = v;
+            }
+        }
+    }
+    pair<int, int> dest = make_pair(n - 1, m - 1);
+    if(dest!=start&&d[dest]==0){
+        cout<<"No path found"<<endl;
+        return 0;
+    }
+    vector<pair<int, int>> path;
+    path.push_back(dest);
+    pair<int, int> curr = p[dest];
+    while (curr != p[start])
+    {
+        path.push_back(curr);
+        curr = p[curr];
+    }
+    reverse(path.begin(), path.end());
+    for (int i = 0; i < path.size(); i++)
+    {
+        cout << "(" << path[i].F << "," << path[i].S << ")"
+             << " ";
+    }
+    cout << endl;
+}

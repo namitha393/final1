@@ -19,7 +19,8 @@ var CourseSchema = new Schema(
       courseCode:  {type: String,unique: false},
       students: {type: [String],unique: false},
       instructors:  {type: [String],unique: false},
-      sem:  {type: String,unique: false}
+      sem:  {type: String,unique: false},
+      assignments: [String]
   }
 )
 

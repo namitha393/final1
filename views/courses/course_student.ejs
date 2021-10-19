@@ -3,12 +3,20 @@
 
 
 
-
-
-
-
-
-
+<br>
+<div style="padding-left:400px">
+<% ass.forEach(ass1=>{ %>
+  <div class="card" style="width: 50rem;">
+    <!-- <img src="..." class="card-img-top" alt="..."> -->
+    <div class="card-body">
+      <h5 class="card-title"><%=ass1.nameofA%></h5>
+      <p class="card-text"><%=ass1.desc%></p>
+      <p class="card-text"><%=ass1.deadline%></p>
+      <a href=/student/courses/<%=course.name%>/assignments/<%=ass1.nameofA%> class="btn btn-primary stretched-link">View</a>
+    </div>
+  </div>
+<% }) %>
+</div>
 
 
 
