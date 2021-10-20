@@ -5,14 +5,16 @@
 
 <br>
 <div style="padding-left:400px">
-<% ass.forEach(ass1=>{ %>
+<% data.forEach(d=>{ %>
   <div class="card" style="width: 50rem;">
     <!-- <img src="..." class="card-img-top" alt="..."> -->
     <div class="card-body">
-      <h5 class="card-title"><%=ass1.nameofA%></h5>
-      <p class="card-text"><%=ass1.desc%></p>
-      <p class="card-text"><%=ass1.deadline%></p>
-      <a href=/student/courses/<%=course.name%>/assignments/<%=ass1.nameofA%> class="btn btn-primary stretched-link">View</a>
+      <h5 class="card-title"><%=d.ass.nameofA%></h5>
+      <p class="card-text">Description: <%=d.ass.desc%></p>
+      <p class="card-text">Deadline: <%=d.ass.deadline%></p>
+      <p class="card-text">Feedback: <%=d.feedback%></p>
+      <p class="card-text">Grade: <%=d.grade%></p>
+      <a href=/student/courses/<%=course.name%>/assignments/<%=d.ass.nameofA%> class="btn btn-primary stretched-link">View</a>
     </div>
   </div>
 <% }) %>
