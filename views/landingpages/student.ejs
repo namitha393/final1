@@ -3,7 +3,7 @@
 
   <div class="container" style="padding-left: 900px">
     <div class="btn-group">
-      <a href="/student/join">
+      <a href="/user/student/join">
     <button type="button" class="btn btn-outline-secondary" style="margin-right: 20px;" >Join a course</button>
     </a>
     <div class="dropdown">
@@ -11,8 +11,8 @@
         Student
       </button>
       <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-          <a class="dropdown-item" href="/student">Student</a>
-          <a class="dropdown-item" href="/instructor">Instructor</a>
+          <a class="dropdown-item" href="/user/student">Student</a>
+          <a class="dropdown-item" href="/user/instructor">Instructor</a>
       </div>
     </div>
     <div class="dropdown">
@@ -20,7 +20,7 @@
         <%=_doc.name%>
       </button>
       <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-        <a class="dropdown-item" href=/student/profile>Profile</a>
+        <a class="dropdown-item" href=/user/profile>Profile</a>
         <a class="dropdown-item" href="/logout">Logout</a>
       </div>
     </div>
@@ -36,7 +36,7 @@
           <h5 class="card-title"><%=course.name%></h5>
           <p class="card-text"><%=course.courseCode%>-<%=course.sem%></p>
       
-          <a href=/student/courses/<%=course.name%> class="btn btn-primary stretched-link">View</a>
+          <a href=/user/student/courses/<%=course.name%> class="btn btn-primary stretched-link">View</a>
         </div>
       </div>
     <% }) %>
