@@ -1,0 +1,38 @@
+<%- include('../partials/header') %>
+
+
+
+<div class="container">
+    <div class="main-body">
+        <div class="row" style="margin-top: 30px;margin-left: 200px">
+
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-body">
+                        <form class="" method="post" action=/<%=Role%>/join>
+                            <div class="form-group">
+                                <label for="code">Access code</label>
+                                <input type="text" class="form-control" name="code" required autocomplete="off">
+                        </div>
+
+                        </div>
+                        <div class="row" style="margin-left: 120px">
+                            <div class="col-sm-3"></div>
+                            <button type="submit" class="btn btn-primary px-4">Submit</button>
+                        </div>
+                       
+                    </form>
+                    </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+<%- include('../partials/footer') %>

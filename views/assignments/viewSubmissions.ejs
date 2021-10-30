@@ -1,0 +1,64 @@
+<%- include('../partials/header') %>
+
+    <html lang="en" dir="ltr" style="
+    margin-top: 40px;
+    margin-right: 300px;
+    text-align: center;
+">
+
+<br>
+<br>
+<br>
+<div class="container">
+    <div class="main-body">
+        <div class="row">
+            <div class="col-lg-4">
+            </div>
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-body">
+                        <div >
+                            <% subs.forEach(sub=>{ %>
+                                <div class="form-group">
+                                    <label for="name"><%=sub.studentName%>: </label>
+                                    <a href=/download/submissions/<%=sub._id%>><%=sub.FileName%></a>
+                                </div>
+                            <% }) %>
+                          </div>
+                          
+</div>
+
+</div>
+                
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+<br>
+<div style="padding-left: 450px">
+    <%var route="/instructor/courses/"+courseName+"/assignments/"+assName%>
+   
+<form action=<%=route%> enctype="multipart/form-data" method="POST">
+    <div class="file-input>
+        <div class="fl">
+            <label for="file">Feedback:</label>
+                <input type="file" class="admin__input" id="myFile" name="myFile" accept=".xls,.xlsx,.csv"/ required>
+            </div>
+            
+            <div class="row" style="margin-left: 10px">
+                <div class="col-sm-1"></div>
+                <button type="submit" class="btn btn-primary px-4">Submit</button>
+    </div>
+    </form>
+</div>
+
+
+
+
+
+
+
+
+
+<%- include('../partials/footer') %>

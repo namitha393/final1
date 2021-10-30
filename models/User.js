@@ -6,13 +6,14 @@ const {Schema} = mongoose;
 
 mongoose.connect("mongodb://localhost:27017/MoodleDB", {
   useNewUrlParser: true,
+
 });
 
 
 var UserSchema = new Schema(
   { 
     name: String, 
-    username: {type: String, unique: true},  //Use this as roll number(Ldap id)
+    username: String, 
     email: String,
     SCourses: [String],
     ICourses: [String],
