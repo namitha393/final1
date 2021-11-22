@@ -1,0 +1,34 @@
+
+Mongoose:
+indexes in schemas: https://stackoverflow.com/questions/36822937/purpose-of-index-in-mongoose-schema
+
+
+
+
+
+Routes: *********
+Query strings: https://stackoverflow.com/questions/19035373/how-do-i-redirect-in-expressjs-while-passing-some-context
+
+for deadlines:
+Checking_when_a_deadline_is_due:https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API/Checking_when_a_deadline_is_due
+checkboxes to conditionally show something: https://www.w3schools.com/howto/tryit.asp?filename=tryhow_js_display_checkbox_text
+Button visibility(best): https://flexiple.com/disable-button-javascript/ 
+visibility: https://stackoverflow.com/questions/8685107/hiding-a-button-in-javascript
+Event calendar: https://www.youtube.com/watch?v=YSEY9CbWpHU
+calendar in js: https://www.youtube.com/watch?v=krOTeX1DqHI
+calendar in node.js:  https://dev.to/536uriel/how-to-build-basic-and-dynamic-calendar-with-nodejs-1f8c
+Schedule functions in express: https://www.codementor.io/@miguelkouam/how-to-schedule-tasks-in-node-js-express-using-agenda-h8sdo6b9p
+Job scheduling: https://www.section.io/engineering-education/job-scheduling-in-nodejs/
+nodejs scheduler: https://stackoverflow.com/questions/20499225/i-need-a-nodejs-scheduler-that-allows-for-tasks-at-different-intervals
+
+
+Forums and DMs:
+forum in node.js and express:https://github.com/akinmaurice/node-express-forum
+another github link: https://github.com/akinmaurice/node-express-forum
+DMs: https://stackoverflow.com/questions/23619015/creating-a-private-chat-between-a-key-using-a-node-js-and-socket-io
+(involves socket programming)
+
+Might be useful for autograding: https://gradescope-autograders.readthedocs.io/en/latest/specs/
+
+
+CLI with node.js: https://www.twilio.com/blog/how-to-build-a-cli-with-node-js

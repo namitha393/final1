@@ -26,6 +26,10 @@
                             <input type="text" class="form-control" name="sem"  required>
                         </div>
                         <div class="form-group">
+                            <input type="checkbox" name="flag">
+                            <label for="flag">Give permission to TAs to create assignments</label><br>
+                        </div>
+                        <div class="form-group">
                             <label for="iaccesscode">Access Code for the instructors</label>
                             <div class="col-sm-9 text-secondary">
                                 <%=i_code%>
@@ -35,6 +39,12 @@
                             <label for="saccesscode">Access Code for the students</label>
                             <div class="col-sm-9 text-secondary">
                                 <%=s_code%>
+                              </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="saccesscode">Access Code for the TAs</label>
+                            <div class="col-sm-9 text-secondary">
+                                <%=t_code%>
                               </div>
                         </div>
                         <div class="row" style="margin-left: 160px">

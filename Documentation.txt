@@ -1,0 +1,12 @@
+
+Helper functions description
+*getCourses(courseIds,cb) and cb's input is courses
+*getCourseIds(user,role,cb) and cb's input is required courses
+*getAssignments=function(Ids,cb) and cb(ass) ass -> list of required assignments
+*getAssignments2=function(courseName,role,cb) and cb(course,ass)
+
+
+Routes(search RX) where X can be
+*authentication
+*editprofile
+*landingpage

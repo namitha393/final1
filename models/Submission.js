@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
 const {Schema} = mongoose;
+var {User}=require("./User");
+var {UserSchema}=require("./User");
 // Creating a Schema for uploaded files
 
 
@@ -21,7 +23,7 @@ const submissionSchema = new Schema({
   grade: String,
   courseName: String,
   assName: String,
-  studentName: String,
+  student: UserSchema,
   FileName: String
 
   //nameofS: String,

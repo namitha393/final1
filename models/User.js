@@ -17,6 +17,7 @@ var UserSchema = new Schema(
     email: String,
     SCourses: [String],
     ICourses: [String],
+    TCourses: [{courseId: String,flag: Boolean}], //flag is true if he can create assignments
     submissions: [String]
   }
 )

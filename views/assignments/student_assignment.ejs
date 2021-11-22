@@ -1,0 +1,191 @@
+<%- include('../partials/header') %>
+
+    <html lang="en" dir="ltr" style="
+    margin-top: 40px;
+    margin-right: 300px;
+    text-align: center;
+">
+
+<head>
+  <style>
+    body {
+      font-family: "Lato", sans-serif;
+    }
+    
+    .sidenav {
+      height: 100%;
+      width: 0;
+      position: fixed;
+      z-index: 1;
+      top: 0;
+      left: 0;
+      background-color: #111;
+      overflow-x: hidden;
+      transition: 0.5s;
+      padding-top: 60px;
+    }
+    
+    .sidenav a {
+      padding: 8px 8px 8px 32px;
+      text-decoration: none;
+      font-size: 25px;
+      color: #818181;
+      display: block;
+      transition: 0.3s;
+    }
+    
+    .sidenav a:hover {
+      color: #f1f1f1;
+    }
+    
+    .sidenav .closebtn {
+      position: absolute;
+      top: 0;
+      right: 25px;
+      font-size: 36px;
+      margin-left: 50px;
+    }
+    
+    @media screen and (max-height: 450px) {
+      .sidenav {padding-top: 15px;}
+      .sidenav a {font-size: 18px;}
+    }
+    </style>
+</head>
+<div id="mySidenav" class="sidenav">
+  <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+  <a href="/student">Dashboard</a>
+  <a href=/<%=course.name%>/neParticipants>Participants</a>
+
+  <a href="">Calendar</a>
+  <a href="">Grades</a>
+
+</div>
+
+<div class="container" style="padding-left: 0px;margin-left: 20px;">
+  <span style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776;</span>
+
+
+  <%var assName=ass.nameofA %>
+
+  <p style="text-align: center;font-size: 40px;"><%=assName%></p>
+
+      <p style="text-align: center;"><strong >Opened</strong>: <%=ass.createdAt%></p>
+      <p style="text-align: center;"><strong >Due</strong>: <%=ass.deadline%></p>
+</div>
+
+<br>
+
+    <%var ss="No submission"%>
+    <%var grade="-"%>
+    <%var feed="-"%>
+    <%if(sub!=null) ss="Submitted for grading" %>
+    <%if(sub!=null&&sub.grade!=null) grade=sub.grade %>
+    <%if(sub!=null&&sub.feedback) feed=sub.feedback %>
+    <table class="generaltable" style="margin:0 auto;">
+    <tbody>
+    <tr class="">
+    <th class="cell c0" style="" scope="row">Assignment file</th>
+    <td class="cell c1 lastcol" style=""><a href=/download/assignment/<%=ass.nameofA%>>problem statement</a></td>
+    </tr>
+    <tr class="">
+    <th class="cell c0" style="" scope="row">Submission status</th>
+    <td class="cell c1 lastcol" style=""><%=ss%></td>
+    </tr>
+    <tr class="">
+    <th class="cell c0" style="" scope="row">Grade</th>
+    <td class="cell c1 lastcol" style=""><%=grade%></td>
+    </tr>
+    <th class="cell c0" style="" scope="row">Feedback</th>
+    <td class="cell c1 lastcol" style=""><%=feed%></td>
+    </tr>
+    <tr class="lastrow">
+    <th class="cell c0" style="" scope="row">Time remaining</th>
+    <td class="cell c1 lastcol" style=""> <%=days%> days <%=hrs%> hours <%=mins%> mins <%=seconds%> seconds</td>
+    </tr>
+    </tbody>
+    </table>
+
+
+<br>
+<div class="container">
+    <div class="main-body">
+        <div class="row">
+            <div class="col-lg-4">
+            </div>
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-body">
+<form action=/student/courses/<%=course.name%>/assignments/<%=ass.nameofA%> enctype="multipart/form-data" method="POST">
+                        <div class="form-group">
+                            <label for="name">file name</label>
+                            <input type="text" class="form-control" name="name" required>
+                    </div>
+	<div class="file-input>
+		<div class="fl">
+			<label for="file">submission:</label>
+    			<input type="file" class="admin__input" id="myFile" name="myFile" />
+    		</div>
+    		<br>
+    		
+    		 <div class="row" style="margin-left: 160px">
+                            <div class="col-sm-3"></div>
+                            <button type="submit" id="submitButton" class="btn btn-primary px-4">Submit</button>
+               </div>
+  </form>
+</div>
+</div>
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+<script>
+  function openNav() {
+    document.getElementById("mySidenav").style.width = "250px";
+  }
+  
+  function closeNav() {
+    document.getElementById("mySidenav").style.width = "0";
+  }
+  </script>
+     
+
+     <script >
+document.addEventListener('DOMContentLoaded', function(event) {
+  let deadline = ass.deadline; // at 12:00 AM
+  let now = new Date(); // current date and time
+  let milliseconds = deadline.getTime() - now.getTime();
+  milliseconds = 1000; // set to 10 seconds for testing purposes
+  let submit = document.getElementById('submitButton');
+  if (milliseconds > 0) {
+    window.setTimeout(function() {
+      submit.style.display = 'none';
+    }, milliseconds);
+  }
+  else {
+    submit.style.display = 'none';
+  } 
+  
+});
+    
+    </script>
+
+
+
+
+
+
+
+
+
+
+<%- include('../partials/footer') %>

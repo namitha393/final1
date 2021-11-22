@@ -1,0 +1,38 @@
+
+NOTE: THESE ARE JUST BRIEF POINTS. TO RECALL THE WHOLE THING, READ THE DOC
+
+*organise the Assignments into Courses
+*students, TAs(note: it's not exactly non-editing teachers), teachers(Admin too, like the original moodle)
+*Should know if a user is online(+last access to the course too maybe)
+*A teacher should be able to enroll or deregister students
+*Editing power of a TA(options can be(other than grading) adding assignments).diff between teacher: Teacher can make announcements, 
+enroll/deregister participants.
+
+
+*Implement deadlines for assignments and show to-do lists(for all roles). Maybe try to visualize them on calendar
+
+*forums,DMs(teacher should be able to disable them)
+
+*Upload grades via csv file
+*Do data analysis with the data you have
+
+*Autograding(it's overwhelming af)
+
+*CLI for students
+
+*% of course completed
+
+*Emails(all possible)
+
+**************************************
+*Create profile pages for each role?
+
+
+
+
+
+
+
+
+
+
