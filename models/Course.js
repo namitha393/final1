@@ -23,7 +23,8 @@ var CourseSchema = new Schema(
       flag: Boolean,
       tas: {type: [String],unique: false},
       sem:  {type: String,unique: false},
-      assignments: [String]
+      assignments: [String],
+       //percentage
   }
 )
 

@@ -96,20 +96,23 @@
   </div>
   <br>
   <div style="padding-left:300px">
-    <% courses.forEach(course=>{ %>
-     
+    <% courses.forEach(courseinfo=>{ %>
+      <% var sty="width: " + courseinfo.assfinished.toString()+"%;"%>
+      <% var n=courseinfo.assfinished.toString()%>
       <div class="card" style="width: 50rem;">
         <!-- <img src="..." class="card-img-top" alt="..."> -->
         <div class="card-body">
-          <h5 class="card-title"><%=course.name%></h5>
-          <p class="card-text"><%=course.courseCode%>-<%=course.sem%></p>
+          <h5 class="card-title"><%=courseinfo.course.name%> </h5>
+          <p class="card-text"><%=courseinfo.course.courseCode%>-<%=courseinfo.course.sem%>
+            <div class="progress">
+              <div class="progress-bar" role="progressbar" style="width: <%=n%>%" aria-valuenow="<%=n%>" aria-valuemin="0" aria-valuemax="100"><%=n%>%</div>
+            </div></p>
       
-          <a href=/ta/courses/<%=course.name%> class="btn btn-primary stretched-link">View</a>
+          <a href=/ta/courses/<%=courseinfo.course.name%> class="btn btn-primary stretched-link">View</a>
         </div>
       </div>
     <% }) %>
   </div>
-  
   <script>
     function openNav() {
       document.getElementById("mySidenav").style.width = "250px";

@@ -76,7 +76,10 @@
 
 <br>
 
-
+<% var now=new Date() %>
+<% var t=ass.deadline.getTime()-now.getTime() %>
+<%var str="  "%>
+<% if(t<0) str=" Assignment is overdue by " %>
 
 
 <h3 style="text-align: center;">Grading summary</h3><div class="box py-3 boxaligncenter gradingsummarytable">
@@ -92,7 +95,7 @@
     </tr>
     <tr class="lastrow">
     <th class="cell c0" style="" scope="row">Time remaining</th>
-    <td class="cell c1 lastcol" style=""> <%=days%> days <%=hrs%> hours <%=mins%> mins <%=seconds%> seconds</td>
+    <td class="cell c1 lastcol" style=""> <%=str%> <%=days%> days <%=hrs%> hours <%=mins%> mins <%=seconds%> seconds</td>
     </tr>
     </tbody>
     </table>

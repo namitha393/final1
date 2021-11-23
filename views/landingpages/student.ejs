@@ -49,8 +49,8 @@
   <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
   <a href="">Dashboard</a>
   <a href="/student/calendar">Calendar</a>
-  <% courses.forEach(course=>{ %>
-    <a href=/student/courses/<%=course.name%>><%=course.name%></a>
+  <% courses.forEach(courseinfo=>{ %>
+    <a href=/student/courses/<%=courseinfo.course.name%>><%=courseinfo.course.name%></a>
   <% }) %>
 </div>
 <div class="container" style="padding-left: 0px;margin-left: 20px;">
@@ -63,7 +63,7 @@
 
   <div class="btn-group">
     <a href="/student/join">
-  <button type="button" class="btn btn-outline-secondary" style="margin-right: 20px;" >Join a course</button>
+  <button type="button" class="btn btn-outline-secondary" style="margin-right: 20px;" >Join a courseinfo</button>
   </a>
   <div class="dropdown">
     <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="margin-right: 20px">
@@ -94,15 +94,19 @@
 </div>
 <br>
 <div style="padding-left:300px">
-  <% courses.forEach(course=>{ %>
-   
+  <% courses.forEach(courseinfo=>{ %>
+    <% var sty="width: " + courseinfo.assfinished.toString()+"%;"%>
+    <% var n=courseinfo.assfinished.toString()%>
     <div class="card" style="width: 50rem;">
       <!-- <img src="..." class="card-img-top" alt="..."> -->
       <div class="card-body">
-        <h5 class="card-title"><%=course.name%></h5>
-        <p class="card-text"><%=course.courseCode%>-<%=course.sem%></p>
+        <h5 class="card-title"><%=courseinfo.course.name%> </h5>
+        <p class="card-text"><%=courseinfo.course.courseCode%>-<%=courseinfo.course.sem%>
+          <div class="progress">
+            <div class="progress-bar" role="progressbar" style="width: <%=n%>%" aria-valuenow="<%=n%>" aria-valuemin="0" aria-valuemax="100"><%=n%>%</div>
+          </div></p>
     
-        <a href=/student/courses/<%=course.name%> class="btn btn-primary stretched-link">View</a>
+        <a href=/student/courses/<%=courseinfo.course.name%> class="btn btn-primary stretched-link">View</a>
       </div>
     </div>
   <% }) %>

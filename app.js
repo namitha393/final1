@@ -39,7 +39,8 @@ app.set("views", [
   __dirname + "/views/courses",
   __dirname + "/views/profile",
   __dirname + "/views/assignments",
-  __dirname + "/views/participants"
+  __dirname + "/views/participants",
+  __dirname + "/views/calendar",
 ])
 
 app.use(express.json());
@@ -347,19 +348,34 @@ app.get("/:Role", (req, res) => {
     return res.redirect("/login");
   }
   var role = req.params.Role;
+  //console.log(role);
   func.getCourseIds(req.user._id,role,(Ids)=>{
     //console.log(Ids);
     func.getCourses(Ids,(courses)=>{
       //console.log(courses);
       return res.render(role,{
         ...(req.user),
-        courses: courses
+        courses: courses,
       })
     })
   })
 
   //console.log(courseIds);
 
+})
+
+app.post("/student/courses/:courseName/flag/:assName",(req,res)=>{
+  var assName=req.params.assName;
+  var courseName=req.params.courseName;
+  var f=false;
+  if(req.body.flag=="on") f=true;
+  //console.log(req.body);
+  Assignment.findOneAndUpdate({nameofA:assName},{ $set: {
+    flag: f
+  }},(err)=>{
+    if(err) console.log(err);
+  })
+  res.redirect("/student/courses/"+courseName);
 })
 
 app.post("/instructor/create", async(req, res) => {
@@ -374,7 +390,7 @@ app.post("/instructor/create", async(req, res) => {
     sem: req.body.sem,
     instructors: [req.user._id],
     tas: [],
-    flag: req.body.flag ? true : false
+    flag: req.body.flag ? true : false,
   })
   //var c=[];
   newCourse.save((err) => {
@@ -554,7 +570,7 @@ app.post("/instructor/courses/:courseName/createAssignment", upload.single("myFi
   //console.log(req.body.time);
   var d=new Date(req.body.date+"T"+req.body.time+":00");
 
-    const newFile = await Assignment.create({name: req.file.filename, nameofA: req.body.nameofA, desc: req.body.description, deadline: d,courseName: req.params.courseName});
+    const newFile = await Assignment.create({name: req.file.filename, nameofA: req.body.nameofA, desc: req.body.description, deadline: d,courseName: req.params.courseName,flag: flase});
     var q = Course.findOne({name: req.params.courseName});
     q.exec(async(err, course) => {
       var ass = course.assignments;
@@ -580,11 +596,11 @@ app.get("/instructor/courses/:courseName/assignments/:assName", (req, res) => {
   Course.findOne({name:courseName},(err,course)=>{
     var students=course.students.length;
     Assignment.findOne({nameofA:assName},(err,ass)=>{
-      var ts=Math.floor((ass.deadline-Date.now())/1000);
-      var days=Math.floor(ts/(3600*24));
-      var hrs=Math.floor((ts-days*3600*24)/(3600));
-      var mins= Math.floor((ts-days*3600*24-hrs*3600)/60);
-      var seconds=Math.floor((ts-days*3600*24-hrs*3600-mins*60));
+      var ts=Math.floor(Math.abs((ass.deadline-Date.now())/1000));
+      var days=Math.floor(Math.abs(ts/(3600*24)));
+      var hrs=Math.floor(Math.abs((ts-days*3600*24)/(3600)));
+      var mins= Math.floor(Math.abs((ts-days*3600*24-hrs*3600)/60));
+      var seconds=Math.floor(Math.abs((ts-days*3600*24-hrs*3600-mins*60)));
       Submission.find({
         courseName: req.params.courseName,
         assName:assName
@@ -645,11 +661,11 @@ app.get("/student/courses/:courseName/assignments/:assName", (req, res) => {
         } else if (ass == null) {
           res.redirect("/student");
         } else {
-          var ts=Math.floor((ass.deadline-Date.now())/1000);
-          var days=Math.floor(ts/(3600*24));
-          var hrs=Math.floor((ts-days*3600*24)/(3600));
-          var mins= Math.floor((ts-days*3600*24-hrs*3600)/60);
-          var seconds=Math.floor((ts-days*3600*24-hrs*3600-mins*60));
+          var ts=Math.floor(Math.abs((ass.deadline-Date.now())/1000));
+          var days=Math.floor(Math.abs(ts/(3600*24)));
+          var hrs=Math.floor(Math.abs((ts-days*3600*24)/(3600)));
+          var mins= Math.floor(Math.abs((ts-days*3600*24-hrs*3600)/60));
+          var seconds=Math.floor(Math.abs((ts-days*3600*24-hrs*3600-mins*60)));
           Submission.findOne({
             courseName: req.params.courseName,
             assName:assName,
@@ -789,8 +805,9 @@ app.get("/:courseName/eParticipants",(req,res)=>{
 })
 
 app.get("/student/calendar",(req,res)=>{
-  
+
 })
+
 
 
 app.listen(port, function () {

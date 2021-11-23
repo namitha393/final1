@@ -33,11 +33,23 @@ var getCourses=function(courseIds,cb){
         } else if (course == null) {
           cb(courses);
           return;
-        } else 
-          courses.push(course);
-          if(courses.length==courseIds.length){
-            cb(courses);
-          }
+        }else {
+          var n=0,total=0;
+          //console.log(n);
+          Assignment.find({courseName:course.name},(err,ass)=>{
+            ass.forEach(ass1=>{
+              total+=1;
+              if(ass1.flag) n+=1;
+            })
+            //console.log(n);
+            n=n*100/total;
+            courses.push({course: course,assfinished: n});  
+            if(courses.length==courseIds.length){
+              cb(courses);
+            }
+          })
+        }
+
         }
       )
     })

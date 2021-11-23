@@ -69,7 +69,8 @@
 <br>
 <div style="padding-left:400px">
 <% data.forEach(d=>{ %>
-  <div class="card" style="width: 50rem;">
+
+  <div class="card" style="width: 50rem;" >
     <!-- <img src="..." class="card-img-top" alt="..."> -->
     <div class="card-body">
       <h5 class="card-title"><%=d.ass.nameofA%></h5>
@@ -77,6 +78,21 @@
       <a href=/student/courses/<%=course.name%>/assignments/<%=d.ass.nameofA%> class="btn btn-primary stretched-link">View</a>
     </div>
   </div>
+  <form method="post" action=/student/courses/<%=course.name%>/flag/<%=d.ass.nameofA%>>
+  <%if(d.ass.flag){%>
+  <div>
+    <input type="checkbox" name="flag" checked onchange="submit()">
+    <label for="flag">Done</label><br>
+  </div>
+  <%}else{%>
+  <div>
+    <input type="checkbox" name="flag" onchange="submit()">
+    <label for="flag">Done</label><br>
+  </div>
+  <%}%> 
+  </form>
+  <br>
+  <br>
 <% }) %>
 </div>
 
