@@ -7,6 +7,7 @@ const mongoose = require("mongoose");
 var session = require("express-session"),
   bodyParser = require("body-parser");
 var passport = require('passport');
+
 //const passportLocalMongoose = require('passport-local-mongoose');
 var {User} = require("./models/User.js")
 var {Course} = require("./models/Course.js")
@@ -335,13 +336,15 @@ app.post("/:Role/join", (req, res) => {
 })
 
 //Rlandingpage
-app.get("/:Role", (req, res) => {
+app.get("/:Role", (req, res,next) => {
   if (!req.isAuthenticated()) {
     return res.redirect("/login");
   }
 
-  if (req.params.Role != "student" && req.params.Role != "instructor" &&req.params.Role!="ta") 
-    return;
+  if (req.params.Role != "student" && req.params.Role != "instructor" &&req.params.Role!="ta"){
+    next();
+  }
+
  // console.log(req.user);
   //console.log(req.user);
   if (!req.isAuthenticated()) {
@@ -803,11 +806,67 @@ app.get("/:courseName/eParticipants",(req,res)=>{
   var courseName = req.params.courseName;
   
 })
+app.get('/init', function (req, res) {
+  console.log("in init");
+  events.insertOne({
+    text: "Some Helpful event",
+    start_date: new Date(2018, 8, 1),
+    end_date: new Date(2018, 8, 5)
+  })
+  events.insertOne({
+    text: "Another Cool Event",
+    start_date: new Date(2018, 8, 11),
+    end_date: new Date(2018, 8, 11)
+  })
+  events.insertOne({
+    text: "Super Activity",
+    start_date: new Date(2018, 8, 9),
+    end_date: new Date(2018, 8, 10)
+  })
+  res.send("Test events were added to the database")
+});
 
 app.get("/student/calendar",(req,res)=>{
-
+  res.render("cal_student.ejs");
 })
 
+
+
+app.get("/student/data", function (req, res) {
+  data=[];
+  var l=0;
+  Course.find((err,courses)=>{
+    //console.log(courses);
+    courses.forEach(course=>{
+      l+=1;
+      Assignment.find({courseName:course.name,flag: false},(err,ass)=>{
+        ass.forEach(ass1=>{
+          data.push({
+            _id: ass1._id,
+            id: ass1.id,
+            text: ass1.nameofA+"("+course.name+")",
+            "start_date": ass1.createdAt,
+            "end_date": ass1.deadline,
+          })
+        })
+        if(l==courses.length) res.send(data);
+      })
+    })
+  })
+});
+
+app.get("/grader/data", function (req, res) {
+  data=[];
+
+});
+
+
+
+
+
+
+	// Routes HTTP POST requests to the specified path with the specified callback functions. For more information, see the routing guide.
+	// http://expressjs.com/en/guide/routing.html
 
 
 app.listen(port, function () {
