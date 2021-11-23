@@ -23,7 +23,8 @@ const submissionSchema = new Schema({
   grade: String,
   courseName: String,
   assName: String,
-  student: UserSchema,
+  studentID: String,
+  studentName: String,
   FileName: String
 
   //nameofS: String,

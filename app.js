@@ -653,12 +653,13 @@ app.get("/student/courses/:courseName/assignments/:assName", (req, res) => {
           Submission.findOne({
             courseName: req.params.courseName,
             assName:assName,
-            student: req.user
+            studentID: req.user._id
           },(err,sub)=>{
             if(err){
               console.log(err);
             }
             else{
+              //console.log(sub);
               res.render("student_assignment",{
                 course:course,
                 ass:ass,
@@ -684,7 +685,8 @@ app.post("/student/courses/:courseName/assignments/:assName", upload.single("myF
       grade: null,
       courseName: req.params.courseName,
       assName: req.params.assName,
-      student: req.user,
+      studentID: req.user._id,
+      studentName: req.user.name,
       FileName: req.body.name
     })
     var q = User.findById(req.user._id);
@@ -712,7 +714,30 @@ app.post("/instructor/courses/:courseName/assignments/:assName", upload.single("
     // var b=req.file["buffer"]; console.log(b.toString());
     // console.log(b.toString()); console.log("wtf");
     const newF = await Feedback.create({name: req.file.filename, courseName: req.params.courseName, assName: req.params.assName})
-    res.send({status: "Successfully uploaded"});
+    var courseName=req.params.courseName;
+    var assName=req.params.assName;
+    //console.log(courseName);
+    const file = `${__dirname}/public/` + req.file.filename;
+    //console.log(courseName);
+    fs
+    .createReadStream(file)
+    .pipe(csv())
+    .on("data", (row) => {
+      console.log(req.user);
+      console.log(row.Name + " " + row.grade);
+      Submission.findOneAndUpdate({courseName:courseName,assName:assName,studentName:row.Name},{
+        $set: {
+          "grade": row.grade,
+          "feedback": row.feedback
+        }
+      },
+        (err)=>{
+        console.log(err);
+      })
+    })
+    .on("end", () => {
+      res.json({status: "Successfully uploaded"});
+    })
   } catch (err) {
     res.json({err})
   }
@@ -763,7 +788,9 @@ app.get("/:courseName/eParticipants",(req,res)=>{
   
 })
 
-
+app.get("/student/calendar",(req,res)=>{
+  
+})
 
 
 app.listen(port, function () {

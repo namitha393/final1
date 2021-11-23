@@ -108,6 +108,9 @@
 
 
 <br>
+<% var now=new Date() %>
+<% var t=ass.deadline.getTime()-now.getTime() %>
+<%if(t>0){ %>
 <div class="container">
     <div class="main-body">
         <div class="row">
@@ -141,7 +144,7 @@
     </div>
 </div>
 
-
+<% }%>
 
 
 
@@ -159,7 +162,7 @@
   </script>
      
 
-     <script >
+<script >
 document.addEventListener('DOMContentLoaded', function(event) {
   let deadline = ass.deadline; // at 12:00 AM
   let now = new Date(); // current date and time
