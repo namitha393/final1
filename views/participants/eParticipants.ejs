@@ -1,0 +1,35 @@
+
+<%- include('../partials/header') %>
+
+
+<table class="table table-bordered">
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Username</th>
+        <th scope="col">Name</th>
+        <th scope="col">Role</th>
+      </tr>
+    </thead>
+    <% cnt=1 %>
+    <tbody>
+     <%   p.forEach((x)=>{ %>
+            <tr>
+                <th scope="row"><%=cnt%></th>
+                <td><%=x.user.username%></td>
+                <td><%=x.user.name%></td>
+                <td><%=x.role%></td>
+            </tr>
+            <% cnt+=1 %>
+      <%  }) %>
+    </tbody>
+  </table>
+  <form action="enroll" method="GET">    		
+    <div class="row" style="margin-left: 160px">
+        <div class="col-sm-3"></div>
+        <button type="submit" class="btn btn-primary px-4">Enroll Users</button>
+</div>
+  </form>
+
+
+  <%- include('../partials/footer') %>

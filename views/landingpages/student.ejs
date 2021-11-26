@@ -95,8 +95,8 @@
 <br>
 <div style="padding-left:300px">
   <% courses.forEach(courseinfo=>{ %>
-    <% var sty="width: " + courseinfo.assfinished.toString()+"%;"%>
-    <% var n=courseinfo.assfinished.toString()%>
+    <% var sty="width: " + Math.floor(courseinfo.assfinished).toString()+"%;"%>
+    <% var n=Math.floor(courseinfo.assfinished).toString()%>
     <div class="card" style="width: 50rem;">
       <!-- <img src="..." class="card-img-top" alt="..."> -->
       <div class="card-body">

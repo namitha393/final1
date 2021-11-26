@@ -26,8 +26,8 @@ enroll/deregister participants.
 
 **************************************
 *Create profile pages for each role?
-
-
+*make sure that no one who isn't supposed to access a page cannot access it.
+*Take care of all "forEach" cases where there are high chances of mistakes
 
 
 

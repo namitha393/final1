@@ -48,60 +48,76 @@
 </head>
 <div id="mySidenav" class="sidenav">
   <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-  <a href="/instructor">Dashboard</a>
-  <a href=/<%=course.name%>/eParticipants>Participants</a>
-  <a href="">Calendar</a>
+  <a href=/<%=role%>Dashboard</a>
+  <%if(flagE){%>
+  <a href=/<%=course.name%>/eParticipants>Participants</a> 
+  <%}%>
+  <%if(!flagE){%>
+    <a href=/<%=course.name%>/neParticipants>Participants</a> 
+  <%}%>
+  <a href="/<%=role%>/calendar">Calendar</a>
   <a href="">Grades</a>
   <% ass.forEach(ass1=>{ %>
-    <a href=/instructor/courses/<%=course.name%>/assignments/<%=ass1.nameofA%>><%=ass1.nameofA%></a>
+    <a href=/<%=role%>/courses/<%=course.name%>/assignments/<%=ass1.nameofA%>><%=ass1.nameofA%></a>
   <% }) %>
 </div>
-
 <div class="container" style="padding-left: 0px;margin-left: 20px;">
   <span style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776;</span>
 
-
-
-
-  <div>
+</div>
+<div>
     <p style="text-align: center; font-size: 35px;"><%=course.name%></p>
     <p style="text-align: center; font-size: 20px;"><%=course.courseCode%></p>
-    <div style="display: inline-block;margin-left: 1000px;margin-right: 0px">
+<%if(flagA){%>
 
 
-      <div class="container" style="padding-left: 200px">
-        <a href=/instructor/courses/<%=course.name%>/createAssignment>
-          <button type="button" class="btn btn-outline-secondary" style="margin-top: 20px;" >Create an assignment</button>
-          </a>
-        </div>
-      
-  </div>
-  </div>  
+        <div style="display: inline-block;margin-left: 1000px;margin-right: 0px">
+    
+    
+          <div class="container" style="padding-left: 200px">
+            <a href=/instructor/courses/<%=course.name%>/createAssignment>
+              <button type="button" class="btn btn-outline-secondary" style="margin-top: 20px;" >Create an assignment</button>
+              </a>
+            </div>
+          
+      </div>
+     
+    
+<%}%>
+</div>  
 
-  
 
-</div>
 
 <br>
-
-
-
 <div style="padding-left:400px">
+ 
 <% ass.forEach(ass1=>{ %>
-  <%if(ass1){%>
-  <div class="card" style="width: 50rem;">
+
+  <div class="card" style="width: 50rem;" >
     <!-- <img src="..." class="card-img-top" alt="..."> -->
     <div class="card-body">
       <h5 class="card-title"><%=ass1.nameofA%></h5>
-      <p class="card-text"><%=ass1.deadline%></p>
-      <a href=/instructor/courses/<%=course.name%>/assignments/<%=ass1.nameofA%> class="btn btn-primary stretched-link">View</a>
+      <p class="card-text">Deadline: <%=ass1.deadline%></p>
+      <a href=/<%=role%>/courses/<%=course.name%>/assignments/<%=ass1.nameofA%> class="btn btn-primary stretched-link">View</a>
     </div>
   </div>
- <%}%>
+  <form method="post" action=/<%=role%>/courses/<%=course.name%>/flag/<%=ass1.nameofA%>>
+  <%if(ass1.flag){%>
+  <div>
+    <input type="checkbox" name="flag" checked onchange="submit()">
+    <label for="flag">Done</label><br>
+  </div>
+  <%}else{%>
+  <div>
+    <input type="checkbox" name="flag" onchange="submit()">
+    <label for="flag">Done</label><br>
+  </div>
+  <%}%> 
+  </form>
+  <br>
+  <br>
 <% }) %>
 </div>
-
-
 
 
 <script>
@@ -119,4 +135,10 @@
 
 
 
+
+
+
+
 <%- include('../partials/footer') %>
+
+

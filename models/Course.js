@@ -20,11 +20,11 @@ var CourseSchema = new Schema(
       courseCode:  {type: String,unique: false},
       students: {type: [String],unique: false},
       instructors:  {type: [String],unique: false},
-      flag: Boolean,
+      flag1: Boolean, // if tas can create assignments
+      flag2: Boolean, // if tas can enroll students
       tas: {type: [String],unique: false},
       sem:  {type: String,unique: false},
       assignments: [String],
-       //percentage
   }
 )
 

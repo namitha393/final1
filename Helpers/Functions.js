@@ -19,40 +19,77 @@ const csv = require('csv-parser');
 const fs = require('fs');
 
 
-var getCourses=function(courseIds,cb){
+var getCourses=function(courseIds,role,userID,cb){
     var courses=[];
     if(courseIds.length==0){
       cb(courses);
       return;
     }
-    courseIds.forEach(id => {
-      let q2 = Course.findById(id);
-      q2.exec((err, course) => {
-        if (err) {
-          console.log(err);
-        } else if (course == null) {
-          cb(courses);
-          return;
-        }else {
-          var n=0,total=0;
-          //console.log(n);
-          Assignment.find({courseName:course.name},(err,ass)=>{
-            ass.forEach(ass1=>{
-              total+=1;
-              if(ass1.flag) n+=1;
-            })
+    if(role!="student"){
+      courseIds.forEach(id => {
+        let q2 = Course.findById(id);
+        q2.exec((err, course) => {
+          if (err) {
+            console.log(err);
+          } else if (course == null) {
+            cb(courses);
+            return;
+          }else {
+            var n=0,total=0;
             //console.log(n);
-            n=n*100/total;
-            courses.push({course: course,assfinished: n});  
-            if(courses.length==courseIds.length){
-              cb(courses);
-            }
+            Assignment.find({courseName:course.name},(err,ass)=>{
+              ass.forEach(ass1=>{
+                total+=1;
+                if(ass1.flag) n+=1;
+              })
+              //console.log(n);
+              if(total!=0) n=n*100/total;
+              else n=100;
+              courses.push({course: course,assfinished: n});  
+              if(courses.length==courseIds.length){
+                cb(courses);
+              }
+            })
+          }
+        })
+      })
+    }
+    else{
+      User.findById(userID,(err,user)=>{
+        if(err){
+          console.log(err);
+        }
+        else{
+          var courses=[];
+          var scourses=user.SCourses;
+          if(scourses.length==0){
+            cb(courses);
+          }
+          scourses.forEach(obj=>{
+            var courseID=obj.courseID;
+            Course.findById(courseID,(err,course)=>{
+              if(err){
+                console.log(err);
+              }
+              else{
+                var ass=obj.ass;
+                var n=0,total=0;
+                ass.forEach(obj2=>{
+                  total+=1;
+                  if(obj2.flag) n+=1;
+                })
+                if(total!=0) n=n*100/total;
+                else n=100;
+                courses.push({course:course,assfinished: n});
+                if(courses.length==courseIds.length){
+                  cb(courses);
+                }
+              }
+            })
           })
         }
-
-        }
-      )
-    })
+      })
+    }
 }
 var getCourseIds=function(user,role,cb){
   User.findById(user._id,(err,user)=>{

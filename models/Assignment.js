@@ -23,7 +23,8 @@ const assignmentSchema = new Schema({
   deadline: Date,   // (day+time)
   submitted: Number, //number of submissions
   students: Number, //number of students
-  flag: Boolean,
+  flag: Boolean, // true if a grading's done
+  //flag2: Boolean, 
 });
 
 // Creating a Model from that Schema

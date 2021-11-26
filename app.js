@@ -18,7 +18,7 @@ const multer = require("multer");
 
 //const {Schema} = mongoose;
 var _ = require('lodash');
-const {toInteger} = require("lodash");
+const {toInteger, forEach, first} = require("lodash");
 const {off} = require("process");
 const Assignment = require("./models/Assignment.js");
 const Feedback = require("./models/Feedback.js");
@@ -298,7 +298,20 @@ app.post("/:Role/join", (req, res) => {
           else{
             courses=user.TCourses;
           }
-          if(role!="ta") courses.push(course._id);
+          if(role=="instructor") courses.push(course._id);
+          else if(role=="student"){
+            var ass=[];
+            course.assignments.forEach(ass1=>{
+              ass.push({
+                assID: ass1, 
+                flag: false,
+              })
+            })
+            courses.push({
+              courseID: course._id,
+              ass: ass,
+            });
+          } 
           else courses.push({courseId: course._id,flag: course.flag});
           if (role == "student") 
             User.findByIdAndUpdate(user._id, {
@@ -350,12 +363,14 @@ app.get("/:Role", (req, res,next) => {
   if (!req.isAuthenticated()) {
     return res.redirect("/login");
   }
+  //console.log(req.params);
   var role = req.params.Role;
   //console.log(role);
+  //console.log(req.params);
   func.getCourseIds(req.user._id,role,(Ids)=>{
     //console.log(Ids);
-    func.getCourses(Ids,(courses)=>{
-      //console.log(courses);
+    func.getCourses(Ids,role,req.user._id,(courses)=>{
+     // console.log(courses);
       return res.render(role,{
         ...(req.user),
         courses: courses,
@@ -366,6 +381,30 @@ app.get("/:Role", (req, res,next) => {
   //console.log(courseIds);
 
 })
+app.post("/instructor/courses/:courseName/flag/:assName",(req,res,next)=>{
+  var role="instructor",courseName=req.params.courseName,assName=req.params.assName;
+  var f=false;
+  if(req.body.flag=="on") f=true;
+  Assignment.findOneAndUpdate({nameofA:assName},{$set:{flag:f}},(err)=>{
+    if(err) console.log(err);
+    else{
+      res.redirect("/"+role+"/courses/"+courseName);
+    }
+  })
+  
+})
+app.post("/ta/courses/:courseName/flag/:assName",(req,res,next)=>{
+  var role="ta",courseName=req.params.courseName,assName=req.params.assName;
+  var f=false;
+  if(req.body.flag=="on") f=true;
+  Assignment.findOneAndUpdate({nameofA:assName},{$set:{flag:f}},(err)=>{
+    if(err) console.log(err);
+    else{
+      res.redirect("/"+role+"/courses/"+courseName);
+    }
+  })
+  
+})
 
 app.post("/student/courses/:courseName/flag/:assName",(req,res)=>{
   var assName=req.params.assName;
@@ -373,12 +412,47 @@ app.post("/student/courses/:courseName/flag/:assName",(req,res)=>{
   var f=false;
   if(req.body.flag=="on") f=true;
   //console.log(req.body);
-  Assignment.findOneAndUpdate({nameofA:assName},{ $set: {
-    flag: f
-  }},(err)=>{
-    if(err) console.log(err);
+  User.findById(req.user._id,(err,user)=>{
+    if(err){
+      console.log(err);
+    }
+    else{
+      var scourses=user.SCourses;
+      //console.log(scourses);
+      for(var i=0;i<scourses.length;i++){
+        var obj=scourses[i];
+       //console.log(scourses[i]);
+        Course.findOne({name: courseName},(err,course)=>{
+         // console.log(course);
+          if(obj.courseID==course._id){
+            Assignment.findOne({nameofA:assName},(err,ass1)=>{
+              var ass=obj.ass;
+           //   console.log(ass);
+              for(var j=0;j<ass.length;j++){
+                var obj2=ass[j];
+                //console.log(ass1._id);
+                if(obj2.assID==ass1._id){
+                  obj2.flag=f;
+                  ass[j]=obj2;
+                }
+              }
+              obj.ass=ass;
+              var scourses2=user.SCourses;
+              for(var k=0;k<scourses2.length;k++){
+                if(k==i){
+                  scourses2[k]=obj;
+                }
+              }
+              User.findByIdAndUpdate(req.user._id,{$set:{SCourses:scourses2}},(err)=>{
+                if(err) console.log(err);
+              });
+              return res.redirect("/student/courses/"+courseName);
+            })
+          }
+        })
+      }
+    }
   })
-  res.redirect("/student/courses/"+courseName);
 })
 
 app.post("/instructor/create", async(req, res) => {
@@ -393,7 +467,8 @@ app.post("/instructor/create", async(req, res) => {
     sem: req.body.sem,
     instructors: [req.user._id],
     tas: [],
-    flag: req.body.flag ? true : false,
+    flag1: req.body.flag1 ? true : false,
+    flag2: req.body.flag2 ? true : false,
   })
   //var c=[];
   newCourse.save((err) => {
@@ -428,79 +503,34 @@ app.get("/student/courses/:courseName", async(req, res) => {
   if (!req.isAuthenticated()) {
     return res.redirect("/login");
   }
-  var q = Course.findOne({name: req.params.courseName});
-  q.exec(async(err, course) => {
-    if (err) {
-      console.log(err);
-    } else if (course == null) {
-      res.redirect("/student");
-    } else {
-      assIds = course.assignments;
-      var data = [];
-      if (assIds.length == 0) {
-        //console.log("oof");
-        return res.render("course_student", {course:course,data: data}) //update this
+  User.findById(req.user._id,(err,user)=>{
+    Course.findOne({name:req.params.courseName},(err,course)=>{
+      if(err){
+        console.log(err);
+        return;
       }
-      assIds.forEach(id => {
-        Assignment.findById(id, (err, ass) => {
-          //console.log(ass);
-          Feedback.findOne({
-            courseName: course.name,
-            assName: ass.nameofA
-          }, (err, feed) => {
-            var l=data.length;
-            var x = {
-              feedback: "Not yet given",
-              grade: "Not yet given",
-              ass: ass
-            }
-            //console.log(feed);
-            if (feed == null) {
-              data.push(x);
-              if (data.length == assIds.length) {
-                return res.render("course_student", {
-                  data: data,
-                  course: course
-                });
+      var scourses=user.SCourses;
+      scourses.forEach(sc=>{
+        if(sc.courseID==course._id){
+          var ass=sc.ass;
+          var data=[];
+          if(ass.length==0){
+            return res.render("course_student",{data:data,course: course});
+          }
+          ass.forEach(ass1=>{
+            Assignment.findById(ass1.assID,(err,assR)=>{
+              data.push({
+                ass: assR,
+                flag: ass1.flag,
+              })
+              if(data.length==ass.length){
+                return res.render("course_student",{data:data,course: course});
               }
-            } else {
-              var filename = feed.name;
-              const file = `${__dirname}/public/` + filename;
-              fs
-                .createReadStream(file)
-                .pipe(csv())
-                .on("data", (row) => {
-                  //console.log(req.user);
-                  //console.log(row.Name + " " + req.user.name)
-                  if (row.Name == req.user.name) {
-                    var x2 = {
-                      feedback: row.feedback,
-                      grade: row.grade,
-                      ass: ass
-                    }
-                    data.push(x2);
-                    //console.log(data);
-                  }
-                })
-                .on("end", () => {
-                  if(l==data.length){
-                    data.push(x);
-                  }
-                  if (data.length == assIds.length) {
-                    return res.render("course_student", {
-                      data: data,
-                      course: course
-                    });
-                  }
-                })
-              }
-
+            })
           })
-
-        })
+        }
       })
-      //res.render("course_instructor",{course: course});
-    }
+    })
   })
 })
 app.get("/instructor/courses/:courseName", async(req, res) => {
@@ -517,8 +547,11 @@ app.get("/instructor/courses/:courseName", async(req, res) => {
       assIds = course.assignments;
       var ass = [];
       if (assIds.length == 0) {
-        return res.render("course_instructor", {
+        return res.render("course_grader", {
+          flagA: true,
+          flagE: true,
           ass: ass,
+          role: "instructor",
           course: course
         })
       }
@@ -526,8 +559,11 @@ app.get("/instructor/courses/:courseName", async(req, res) => {
         Assignment.findById(id, (err, ass1) => {
           ass.push(ass1);
           if (ass.length == assIds.length) {
-            return res.render("course_instructor", {
+            return res.render("course_grader", {
+              flagA: true,
+              flagE: true,
               ass: ass,
+              role: "instructor",
               course: course
             });
           }
@@ -544,7 +580,10 @@ app.get("/ta/courses/:courseName",(req,res)=>{
   //console.log(req);
   var courseName=req.params.courseName;
   getAssignments2(courseName,"ta",(course,ass)=>{
-    return res.render("course_ta",{
+    return res.render("course_grader",{
+      flagA: course.flag1,
+      flagE: course.flag2,
+      role: "ta",
       ass: ass,
       course: course
     })
@@ -573,10 +612,11 @@ app.post("/instructor/courses/:courseName/createAssignment", upload.single("myFi
   //console.log(req.body.time);
   var d=new Date(req.body.date+"T"+req.body.time+":00");
 
-    const newFile = await Assignment.create({name: req.file.filename, nameofA: req.body.nameofA, desc: req.body.description, deadline: d,courseName: req.params.courseName,flag: flase});
+    const newFile = await Assignment.create({name: req.file.filename, nameofA: req.body.nameofA, desc: req.body.description, deadline: d,courseName: req.params.courseName,flag: false});
     var q = Course.findOne({name: req.params.courseName});
     q.exec(async(err, course) => {
       var ass = course.assignments;
+      var students=course.students;
       ass.push(newFile._id);
       Course.findByIdAndUpdate(course._id, {
         $set: {
@@ -586,7 +626,39 @@ app.post("/instructor/courses/:courseName/createAssignment", upload.single("myFi
         if (err) 
           console.log(err)
       });
-      res.redirect("/instructor/courses/" + req.params.courseName);
+      if(students.length==0){
+        return res.redirect("/instructor/courses/" + req.params.courseName);
+      }
+      students.forEach(id=>{
+        User.findById(id,(err,user)=>{
+          var scourses=user.SCourses;
+          var ind=0,count=0;
+          scourses.forEach(obj=>{
+            if(obj.courseID==course._id){
+              ind=count;
+            }
+            count+=1;
+          })
+          var obj=scourses[ind];
+          var ass=obj.ass;
+          ass.push({
+            assID: newFile._id,
+            flag: false,
+          })
+          //console.log(ass);
+          scourses[ind].ass=ass;
+          //console.log(scourses);
+         // console.log(scourses[ind]);
+          User.findByIdAndUpdate(id,{$set: {SCourses: scourses}},(err)=>{
+            if(err) {
+              console.log(err);
+            }
+            else{
+              res.redirect("/instructor/courses/" + req.params.courseName);
+            }
+          })
+        })
+      })
     })
   
 });
@@ -628,20 +700,45 @@ app.get("/instructor/courses/:courseName/assignments/:assName", (req, res) => {
     })
   })
 
-  // Submission.find({
-  //   courseName: req.params.courseName,
-  //   assName: req.params.assName
-  // }, (err, subs) => {
-  //   if (err) {
-  //     console.log(err);
-  //   } else {
-  //     res.render("viewSubmissions", {
-  //       subs: subs,
-  //       courseName: req.params.courseName,
-  //       assName: req.params.assName
-  //     });
-  //   }
-  // })
+})
+app.get("/ta/courses/:courseName/assignments/:assName", (req, res) => {
+  if (!req.isAuthenticated()) {
+    return res.redirect("/login");
+  }
+  var courseName=req.params.courseName;
+  var assName=req.params.assName;
+  Course.findOne({name:courseName},(err,course)=>{
+    var students=course.students.length;
+    Assignment.findOne({nameofA:assName},(err,ass)=>{
+      var ts=Math.floor(Math.abs((ass.deadline-Date.now())/1000));
+      var days=Math.floor(Math.abs(ts/(3600*24)));
+      var hrs=Math.floor(Math.abs((ts-days*3600*24)/(3600)));
+      var mins= Math.floor(Math.abs((ts-days*3600*24-hrs*3600)/60));
+      var seconds=Math.floor(Math.abs((ts-days*3600*24-hrs*3600-mins*60)));
+      Submission.find({
+        courseName: req.params.courseName,
+        assName:assName
+      },(err,subs)=>{
+        if(err){
+          console.log(err);
+        }
+        else{
+          res.render("grader_assignment",{
+            courseName:courseName,
+            ass:ass,
+            days: days,
+            hrs: hrs,
+            mins: mins,
+            seconds: seconds,
+            students: students,
+            subs: subs
+          });
+        }
+      })
+
+    })
+  })
+
 })
 app.get("/student/courses/:courseName/assignments/:assName", (req, res) => {  
   if (!req.isAuthenticated()) {
@@ -742,8 +839,8 @@ app.post("/instructor/courses/:courseName/assignments/:assName", upload.single("
     .createReadStream(file)
     .pipe(csv())
     .on("data", (row) => {
-      console.log(req.user);
-      console.log(row.Name + " " + row.grade);
+     // console.log(req.user);
+     // console.log(row.Name + " " + row.grade);
       Submission.findOneAndUpdate({courseName:courseName,assName:assName,studentName:row.Name},{
         $set: {
           "grade": row.grade,
@@ -761,6 +858,41 @@ app.post("/instructor/courses/:courseName/assignments/:assName", upload.single("
     res.json({err})
   }
 })
+app.post("/ta/courses/:courseName/assignments/:assName", upload.single("myFile"), async(req, res) => {
+
+  try {
+    // var b=req.file["buffer"]; console.log(b.toString());
+    // console.log(b.toString()); console.log("wtf");
+    const newF = await Feedback.create({name: req.file.filename, courseName: req.params.courseName, assName: req.params.assName})
+    var courseName=req.params.courseName;
+    var assName=req.params.assName;
+    //console.log(courseName);
+    const file = `${__dirname}/public/` + req.file.filename;
+    //console.log(courseName);
+    fs
+    .createReadStream(file)
+    .pipe(csv())
+    .on("data", (row) => {
+     // console.log(req.user);
+     // console.log(row.Name + " " + row.grade);
+      Submission.findOneAndUpdate({courseName:courseName,assName:assName,studentName:row.Name},{
+        $set: {
+          "grade": row.grade,
+          "feedback": row.feedback
+        }
+      },
+        (err)=>{
+        console.log(err);
+      })
+    })
+    .on("end", () => {
+      res.json({status: "Successfully uploaded"});
+    })
+  } catch (err) {
+    res.json({err})
+  }
+})
+
 app.get('/download/assignment/:assName', function (req, res) {
   if (!req.isAuthenticated()) {
     return res.redirect("/login");
@@ -801,72 +933,176 @@ app.get("/:courseName/neParticipants",(req,res)=>{
     res.render("neParticipants",{p:p});
   })
 })
+app.get("/:courseName/eParticipants",(req,res)=>{
+  var courseName=req.params.courseName;
+  getParticipants(courseName,p=>{
+    //console.log(p);
+    res.render("eParticipants",{p:p});
+  })
+})
 
 app.get("/:courseName/eParticipants",(req,res)=>{
   var courseName = req.params.courseName;
   
 })
-app.get('/init', function (req, res) {
-  console.log("in init");
-  events.insertOne({
-    text: "Some Helpful event",
-    start_date: new Date(2018, 8, 1),
-    end_date: new Date(2018, 8, 5)
-  })
-  events.insertOne({
-    text: "Another Cool Event",
-    start_date: new Date(2018, 8, 11),
-    end_date: new Date(2018, 8, 11)
-  })
-  events.insertOne({
-    text: "Super Activity",
-    start_date: new Date(2018, 8, 9),
-    end_date: new Date(2018, 8, 10)
-  })
-  res.send("Test events were added to the database")
-});
+// app.get('/init', function (req, res) {
+//   //console.log("in init");
+//   events.insertOne({
+//     text: "Some Helpful event",
+//     start_date: new Date(2018, 8, 1),
+//     end_date: new Date(2018, 8, 5)
+//   })
+//   events.insertOne({
+//     text: "Another Cool Event",
+//     start_date: new Date(2018, 8, 11),
+//     end_date: new Date(2018, 8, 11)
+//   })
+//   events.insertOne({
+//     text: "Super Activity",
+//     start_date: new Date(2018, 8, 9),
+//     end_date: new Date(2018, 8, 10)
+//   })
+//   res.send("Test events were added to the database")
+// });
 
-app.get("/student/calendar",(req,res)=>{
-  res.render("cal_student.ejs");
+app.get("/:Role/calendar",(req,res)=>{
+  var role=req.params.Role;
+  var s="cal_"+role+".ejs";
+  res.render(s);
 })
 
 
 
 app.get("/student/data", function (req, res) {
   data=[];
-  var l=0;
-  Course.find((err,courses)=>{
-    //console.log(courses);
-    courses.forEach(course=>{
-      l+=1;
-      Assignment.find({courseName:course.name,flag: false},(err,ass)=>{
-        ass.forEach(ass1=>{
-          data.push({
-            _id: ass1._id,
-            id: ass1.id,
-            text: ass1.nameofA+"("+course.name+")",
-            "start_date": ass1.createdAt,
-            "end_date": ass1.deadline,
+  User.findById(req.user._id,(err,user)=>{
+    var sc=user.SCourses;
+    var lc=0;
+    sc.forEach(obj=>{
+      Course.findById(obj.courseID,(err,course)=>{
+        lc+=1;
+        if(err){
+          console.log(err);
+        }
+        else{
+          var ass=obj.ass;
+          var la=0;
+          ass.forEach(obj2=>{
+            Assignment.findById(obj2.assID,(err,ass1)=>{
+              la+=1;
+              if(!obj2.flag){
+                data.push({
+                  _id: ass1._id,
+                  id: ass1.id,
+                  text: ass1.nameofA+"("+course.name+")",
+                  "start_date": ass1.createdAt,
+                  "end_date": ass1.deadline,
+                })
+              }
+              if(lc==sc.length&&la==ass.length){
+               // console.log(data);
+                return res.send(data);
+              }
+              
+            })
           })
-        })
-        if(l==courses.length) res.send(data);
+        }
+      })
+    })
+  })
+
+});
+
+app.get("/instructor/data", function (req, res) {
+  data=[];  
+  //console.log(req.user);
+  User.findById(req.user._id,(err,user)=>{
+    var tcs=user.ICourses;
+    var lc=0;
+    //console.log(tcs);
+    tcs.forEach(cid=>{
+      lc+=1;
+      Course.findById(cid,(err,course)=>{
+        if(err){
+          console.log(err);
+        }
+        else{
+          var assIds=course.assignments;
+          var la=0;
+          assIds.forEach(assId=>{
+            la+=1;
+            Assignment.findById(assId,(err,ass1)=>{
+              if(err) console.log(err);
+              else{
+                //console.log(ass1);
+                if(!ass1.flag){
+                  data.push({
+                    _id: ass1._id,
+                    id: ass1.id,
+                    text: ass1.nameofA+"("+course.name+")",
+                    "start_date": ass1.createdAt,
+                    "end_date": ass1.deadline,
+                  })
+                }
+                //console.log(la);
+                if(lc==tcs.length&&la==assIds.length){
+                  return res.send(data)
+                }
+              }
+            })
+          })
+        }
       })
     })
   })
 });
 
-app.get("/grader/data", function (req, res) {
-  data=[];
-
+app.get("/ta/data", function (req, res) {
+  data=[];  
+  //console.log(req.user);
+  User.findById(req.user._id,(err,user)=>{
+    var tcs=user.TCourses;
+    var lc=0;
+    //console.log(tcs);
+    tcs.forEach(cid=>{
+      lc+=1;
+      Course.findById(cid,(err,course)=>{
+        if(err){
+          console.log(err);
+        }
+        else{
+          var assIds=course.assignments;
+          var la=0;
+          assIds.forEach(assId=>{
+            la+=1;
+            Assignment.findById(assId,(err,ass1)=>{
+              if(err) console.log(err);
+              else{
+                //console.log(ass1);
+                if(!ass1.flag){
+                  data.push({
+                    _id: ass1._id,
+                    id: ass1.id,
+                    text: ass1.nameofA+"("+course.name+")",
+                    "start_date": ass1.createdAt,
+                    "end_date": ass1.deadline,
+                  })
+                }
+                //console.log(la);
+                if(lc==tcs.length&&la==assIds.length){
+                  return res.send(data)
+                }
+              }
+            })
+          })
+        }
+      })
+    })
+  })
 });
 
 
 
-
-
-
-	// Routes HTTP POST requests to the specified path with the specified callback functions. For more information, see the routing guide.
-	// http://expressjs.com/en/guide/routing.html
 
 
 app.listen(port, function () {

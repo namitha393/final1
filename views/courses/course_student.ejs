@@ -68,6 +68,7 @@
 
 <br>
 <div style="padding-left:400px">
+
 <% data.forEach(d=>{ %>
 
   <div class="card" style="width: 50rem;" >
@@ -79,7 +80,7 @@
     </div>
   </div>
   <form method="post" action=/student/courses/<%=course.name%>/flag/<%=d.ass.nameofA%>>
-  <%if(d.ass.flag){%>
+  <%if(d.flag){%>
   <div>
     <input type="checkbox" name="flag" checked onchange="submit()">
     <label for="flag">Done</label><br>
