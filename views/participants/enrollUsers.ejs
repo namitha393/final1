@@ -1,6 +1,6 @@
-
 <%- include('../partials/header') %>
 
+<form class="" action=/<%=courseName%>/mail method="POST">
 
 <table class="table table-bordered">
     <thead>
@@ -14,19 +14,22 @@
     </thead>
     <% cnt=1 %>
     <tbody>
-     <%   p.forEach((x)=>{ %>
+     <%   a.forEach((a1)=>{ %>
             <tr>
                 <th scope="row"><%=cnt%></th>
-                <td><%=x.user.username%></td>
-                <td><%=x.user.name%></td>
-                <td><%=x.user.email%></td>
-                <td><%=x.role%></td>
+                <td><%=a1.username%></td>
+                <td><%=a1.name%></td>
+                <td><%=a1.email%></td>
+                <td><input type="text" name=<%=a1.email%>></td>
             </tr>
             <% cnt+=1 %>
       <%  }) %>
     </tbody>
   </table>
-  
-
+  <div class="row" style="margin-left: 160px">
+    <div class="col-sm-3"></div>
+    <button type="submit" class="btn btn-primary px-4">Send Email invitaion</button>
+</div>
+</form>
 
   <%- include('../partials/footer') %>

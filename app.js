@@ -15,7 +15,7 @@ var {CourseSchema} = require("./models/Course.js")
 var func = require("./Helpers/Functions");
 const path = require("path");
 const multer = require("multer");
-
+var nodemailer = require('nodemailer');
 //const {Schema} = mongoose;
 var _ = require('lodash');
 const {toInteger, forEach, first} = require("lodash");
@@ -87,7 +87,17 @@ passport.deserializeUser(function (id, done) {
     });
 });
 
-
+var transporter = nodemailer.createTransport({
+  host: 'smtp.gmail.com',
+  port: 587,
+  secure: false,
+  requireTLS: true,
+  service: 'gmail',
+  auth: {
+    user: 'FMoodletest1@gmail.com',
+    pass: 'moodletest@1'
+  }
+});
 
 
 //Rauthentication
@@ -1101,6 +1111,78 @@ app.get("/ta/data", function (req, res) {
   })
 });
 
+app.get("/:courseName/enroll",(req,res)=>{
+  var a=[];
+  Course.findOne({name:req.params.courseName},(err,course)=>{
+    var eu=course.students;
+    course.tas.forEach(u=>eu.push(u));
+    course.instructors.forEach(i=>eu.push(i));
+    User.count({},(err,count)=>{
+      var c=0;
+      User.find({},(err,userA)=>{
+        if(err){
+          console.log(err);
+        }
+        else{
+          userA.forEach(user=>{
+            c+=1;
+         
+            var isthere=false;
+            eu.forEach(u=>{
+              if(u==user._id){
+                isthere=true;
+              }
+            })
+          //  console.log(c);
+            if(!isthere) a.push(user);
+            if(c==count){
+              return res.render("enrollUsers.ejs",{a:a,courseName:req.params.courseName});
+            }
+          })
+
+        }
+      })
+    })
+
+  })
+})
+
+app.post("/:courseName/mail",(req,res)=>{
+  var obj=req.body;
+  var data=Object.entries(obj);
+  //console.log(data);
+  data.forEach(x=>{
+    var email=x[0];
+    var role=x[1];
+    Course.findOne({name:req.params.courseName},(err,course)=>{
+      var code="";
+      if(role=="ta"){
+        code=course.t_code;
+      }
+      else if(role=="student"){
+        code=course.s_code;
+      }
+      else if(role=="instructor"){
+        code=course.i_code;
+      }
+      var mailOptions = {
+        from: 'FMoodletest1@gmail.com',
+        to: email,
+        subject: 'Email invitation to join the course '+course.name,
+        text: 'Here is your code to join the course as a '+role+": "+code
+      };
+      
+      transporter.sendMail(mailOptions, function(error, info){
+        if (error) {
+          console.log(error);
+        } else {
+          console.log('Email sent: ' + info.response);
+        }
+      });
+    })
+  })
+  res.redirect("/"+req.params.courseName+"/eParticipants");
+})
 
 
 
