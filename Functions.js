@@ -23,7 +23,7 @@ mongoose.Promise = global.Promise;
 //var XMLHttpRequest = require('xhr2');
 var https = require('https')
 var request=require('request');
-
+const axios = require('axios')
 
 var currUser="";
 var client= MongoClient.connect("mongodb://localhost:27017/MoodleDB");
@@ -401,21 +401,28 @@ var f2=(courseName,assName,path,filename,url)=>{
     // Use case: for some types of streams, you'll need to provide "file"-related information manually.
     // See the `form-data` README for more information about options: https://github.com/form-data/form-data
     name: filename,
+    myFile:fs.createReadStream(__dirname+"\\"+path),
     file: {
-      value:  fs.createReadStream(__dirname+path),
-      filename: 'topsecret.jpg',
-      contentType: 'image/jpeg',
+      filename: filename,
+      contentType: 'pdf',
     }
   };
-  request.post({url:url, formData: formData}, function optionalCallback(err, httpResponse, body) {
-    if (err) {
-      return console.error('upload failed:', err);
-    }
-    console.log('Upload successful!  Server responded with:', body);
+  axios
+  .post(url, formData)
+  .then(res => {
+    console.log(`statusCode: ${res.status}`)
+    console.log(res)
     mongoose.disconnect();
     process.exit();
-    return; 
-  }); 
+    return;
+  })
+  .catch(error => {
+    console.error(error)
+    mongoose.disconnect();
+    process.exit();
+    return;
+  })
+
 }
 var Upload=(courseName,assName,path,fileName)=>{
   Var.findOne({},(err,v)=>{

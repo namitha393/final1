@@ -1220,7 +1220,8 @@ app.post("/student/courses/:courseName/assignments/:assName", upload.single("myF
 
 app.post("/upload/:userName/:pwd/:courseName/:assName", upload.single("myFile"),async(req,res)=>{
   console.log(req.body);
-  console.log(req.file);
+  console.log(req.body.file);
+
 })
 
 app.listen(port, function () {
