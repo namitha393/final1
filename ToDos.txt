@@ -30,7 +30,7 @@ enroll/deregister participants.
 *Take care of all "forEach" cases where there are high chances of mistakes
 *take out password of gmail from app.js (use .env)
 *deregister students
-
+*consider deadlines in cli too
 
 
 

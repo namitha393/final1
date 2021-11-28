@@ -26,6 +26,7 @@ const Submission = require("./models/Submission.js");
 const {createCipheriv, timingSafeEqual} = require("crypto");
 const csv = require('csv-parser');
 const fs = require('fs');
+require('dotenv').config()
 const { getAssignments, getAssignments2, getParticipants } = require("./Helpers/Functions");
 
 // var registration = require('./controllers/register'); var User =
@@ -100,6 +101,7 @@ var transporter = nodemailer.createTransport({
 });
 
 
+
 //Rauthentication
 app.get("/home", (req, res) => {
   res.render("home");
@@ -115,6 +117,12 @@ app.post("/register", (req, res) => {
       res.redirect("/register");
     }
     passport.authenticate("local")(req, res, function () {
+      var userN=req.body.username,pwd=req.body.password;
+      // console.log(userN);
+      // console.log(pwd);
+      fs.appendFileSync(".env",`${userN}=${pwd}\r\n`);
+      //console.log(process.env["user1"]);
+      //console.log(JSON.parse(process.env.MAP));
       res.redirect("/login");
     });
   });
@@ -803,37 +811,7 @@ app.get("/student/courses/:courseName/assignments/:assName", (req, res) => {
     }
   })
 })
-app.post("/student/courses/:courseName/assignments/:assName", upload.single("myFile"), async(req, res) => {
-  try {
-    const newSub = await Submission.create({
-      name: req.file.filename,
-      feedback: null,
-      grade: null,
-      courseName: req.params.courseName,
-      assName: req.params.assName,
-      studentID: req.user._id,
-      studentName: req.user.name,
-      FileName: req.body.name
-    })
-    var q = User.findById(req.user._id);
-    q.exec(async(err, user) => {
-      var subs = [];
-      subs = user.submissions;
-      subs.push(newSub._id);
-      User.findByIdAndUpdate(req.user._id, {
-        $set: {
-          submissions: subs
-        }
-      }, (err) => {
-        if (err) 
-          console.log(err)
-      });
-      res.redirect("/student/courses/" + req.params.courseName);
-    })
-  } catch (error) {
-    res.json({error});
-  }
-})
+
 app.post("/instructor/courses/:courseName/assignments/:assName", upload.single("myFile"), async(req, res) => {
 
   try {
@@ -904,6 +882,7 @@ app.post("/ta/courses/:courseName/assignments/:assName", upload.single("myFile")
 })
 
 app.get('/download/assignment/:assName', function (req, res) {
+  //console.log(req);
   if (!req.isAuthenticated()) {
     return res.redirect("/login");
   }
@@ -1183,9 +1162,66 @@ app.post("/:courseName/mail",(req,res)=>{
   })
   res.redirect("/"+req.params.courseName+"/eParticipants");
 })
+app.get('/download/:userName/:pwd/assignment/:assName', function (req, res) {
+  var userN=req.params.userName, pwd=req.params.pwd;
+  console.log(userN);
+  console.log(pwd);
+  if(process.env[`${userN}`]!=pwd){
+    res.redirect("/login");
+  }
+  else{
+    var assName = req.params.assName;
+    Assignment.findOne({
+      nameofA: assName
+    }, (err, ass) => {
+      if (err) {
+        console.log(err);
+      } else {
+        var filename = ass.name;
+        const file = `${__dirname}/public/` + filename;
+        //console.log(file);
+        res.download(file);
+      }
+    }) 
+  }
+});
 
+app.post("/student/courses/:courseName/assignments/:assName", upload.single("myFile"), async(req, res) => {
+  try {
+    const newSub = await Submission.create({
+      name: req.file.filename,
+      feedback: null,
+      grade: null,
+      courseName: req.params.courseName,
+      assName: req.params.assName,
+      studentID: req.user._id,
+      studentName: req.user.name,
+      FileName: req.body.name
+    })
+    var q = User.findById(req.user._id);
+    q.exec(async(err, user) => {
+      var subs = [];
+      subs = user.submissions;
+      subs.push(newSub._id);
+      User.findByIdAndUpdate(req.user._id, {
+        $set: {
+          submissions: subs
+        }
+      }, (err) => {
+        if (err) 
+          console.log(err)
+      });
+      res.redirect("/student/courses/" + req.params.courseName);
+    })
+  } catch (error) {
+    res.json({error});
+  }
+})
 
-
+app.post("/upload/:userName/:pwd/:courseName/:assName", upload.single("myFile"),async(req,res)=>{
+  console.log(req.body);
+  console.log(req.file);
+})
 
 app.listen(port, function () {
   console.log("Server started on port 3000.");

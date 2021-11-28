@@ -2,6 +2,7 @@
 const mongoose = require("mongoose");
 const passportLocalMongoose = require('passport-local-mongoose');
 const {Schema} = mongoose;
+var bcrypt = require('bcryptjs');
 
 
 mongoose.connect("mongodb://localhost:27017/MoodleDB", {
@@ -30,5 +31,7 @@ var UserSchema = new Schema(
 UserSchema.plugin(passportLocalMongoose, {selectFields: "username name email SCourses ICourses"});
 var User = mongoose.model("User", UserSchema);
 
+
 exports.User=User;
 exports.UserSchema=UserSchema;
+//exports.comparePassword=UserSchema.methods.comparePassword
