@@ -51,7 +51,7 @@
   <a href="/student">Dashboard</a>
   <a href=/<%=course.name%>/neParticipants>Participants</a>
   <a href="/student/calendar">Calendar</a>
-  <a href=/student/<%=course.name%>/grades >Grades</a>
+  <a href=/student/<%course.name%>/grades>Grades</a>
   <% data.forEach(d=>{ %>
     <a href=/student/courses/<%=course.name%>/assignments/<%=d.ass.nameofA%>><%=d.ass.nameofA%></a>
   <% }) %>

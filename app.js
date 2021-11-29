@@ -171,7 +171,7 @@ app.post("/:Role/editProfile", (req, res) => {
   User.findOneAndUpdate({
     "_id": req.user._id
   }, {
-    $set: {
+    $set: {student//grade
       "name": req.body.name,
       "username": req.body.username
     }
@@ -208,7 +208,7 @@ app.post("/:Role/editProfile", (req, res) => {
   //res.redirect("/user/profile");
 })
 
-// schema.methods.changePassword = function(oldPassword, newPassword, cb) {
+// schema.methods.changePstudent//gradeassword = function(oldPassword, newPassword, cb) {
 // const promise = Promise.resolve()     .then(() => {       if (!oldPassword ||
 // !newPassword) {         throw new
 // errors.MissingPasswordError(options.errorMessages.MissingPasswordError);
@@ -719,6 +719,8 @@ app.get("/instructor/courses/:courseName/assignments/:assName", (req, res) => {
   })
 
 })
+app.get("/student/:courseName/grades , (req,res)=> {
+	
 app.get("/ta/courses/:courseName/assignments/:assName", (req, res) => {
   if (!req.isAuthenticated()) {
     return res.redirect("/login");
