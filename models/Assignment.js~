@@ -21,7 +21,7 @@ const assignmentSchema = new Schema({
   courseName: String,
   desc: String,
   deadline: Date,   // (day+time)
-  weightage : Number, 
+  weightage : Number 
   submitted: Number, //number of submissions
   students: Number, //number of students
   flag: Boolean, // true if a grading's done

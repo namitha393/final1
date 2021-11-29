@@ -28,10 +28,6 @@
                                 <input type="text" class="form-control" name="description" required>
                         </div>
                         <div class="form-group">
-                                <label for="description">weightage</label>
-                                <input type="number" class="form-control" name="weightage" required>
-                        </div>
-                        <div class="form-group">
                             <div>
                                 <label for="appt-time">Deadline: </label>
                                 

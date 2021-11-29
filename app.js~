@@ -153,7 +153,8 @@ app.get("/:Role/profile", (req, res) => {
     ...(req.user),
     Role: req.params.Role
   });
-})
+})Mean of marks of students: NaN
+Varience of marks of students: NaN 
 app.get("/:Role/editProfile", (req, res) => {
   if (!req.isAuthenticated()) {
     return res.redirect("/login");
