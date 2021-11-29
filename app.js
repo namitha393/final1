@@ -912,6 +912,7 @@ app.get('/download/submissions/:subId', function (req, res) {
     } else {
       var filename = sub.name;
       const file = `${__dirname}/public/` + filename;
+      
       res.download(file);
     }
   })
@@ -1183,6 +1184,7 @@ app.get('/download/:userName/:pwd/assignment/:assName', function (req, res) {
         var filename = ass.name;
         const file = `${__dirname}/public/` + filename;
         //console.log(file);
+        //console.log(filename);
         res.download(file);
       }
     }) 
