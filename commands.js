@@ -102,11 +102,11 @@ program
     })
 
 program
-    .command("uploadSolution <courseName> <assName> <path> <fileName>")
+    .command("uploadSolution <courseName> <assName> <absolute_path>")
     .alias("u")
     .description("Uploads your solution for an assignment")
-    .action((courseName,assName,path,fileName)=>{
-        Upload(courseName,assName,path,fileName);
+    .action((courseName,assName,path)=>{
+        Upload(courseName,assName,path);
     })
 
 

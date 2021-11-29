@@ -30,6 +30,24 @@ var client= MongoClient.connect("mongodb://localhost:27017/MoodleDB");
 
 
 
+const multerStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "public");
+  },
+  filename: (req, file, cb) => {
+    const ext = file
+      .mimetype
+      .split("/")[1];
+    cb(null, `files/admin-${file.fieldname}-${Date.now()}.${ext}`);
+  }
+});
+
+const upload = multer({
+  storage: multerStorage,
+  //  fileFilter: multerFilter,
+});
+
+
 var showCourses=function(){
   Course.find({},(err,courses)=>{
     if(err){
@@ -389,41 +407,6 @@ var Download=(courseName,assName)=>{
   }) 
 }
 
-var f2=(courseName,assName,path,filename,url)=>{
-  const formData = {
-    // Pass a simple key-value pair
-    params: {
-      courseName: courseName,
-      assName: assName,
-    },
-    // Pass data via Streams
-    // Pass optional meta-data with an 'options' object with style: {value: DATA, options: OPTIONS}
-    // Use case: for some types of streams, you'll need to provide "file"-related information manually.
-    // See the `form-data` README for more information about options: https://github.com/form-data/form-data
-    name: filename,
-    myFile:fs.createReadStream(__dirname+"\\"+path),
-    file: {
-      filename: filename,
-      contentType: 'pdf',
-    }
-  };
-  axios
-  .post(url, formData)
-  .then(res => {
-    console.log(`statusCode: ${res.status}`)
-    console.log(res)
-    mongoose.disconnect();
-    process.exit();
-    return;
-  })
-  .catch(error => {
-    console.error(error)
-    mongoose.disconnect();
-    process.exit();
-    return;
-  })
-
-}
 var Upload=(courseName,assName,path,fileName)=>{
   Var.findOne({},(err,v)=>{
     if(v.currUser=="-"){
@@ -454,7 +437,56 @@ var Upload=(courseName,assName,path,fileName)=>{
                 var url="http://localhost:3000/upload/"+name+"/"+process.env[`${name}`]+"/"+courseName+"/"+assName;
                 //var path="/download/"+name+"/"+process.env[`${name}`]+"/assignment/"+assName;
                 //console.log(url);
-                f2(courseName,assName,path,fileName,url);
+                var filename = path.replace(/^.*[\\\/]/, '');
+                //fs.copyFile(filename);
+                //console.log(filename);
+                var dest=__dirname+`/public/files/admin-${Date.now()}-${filename}`;
+                var subName=`files/admin-${Date.now()}-${filename}`;
+                fs.copyFile(path,dest,async(err)=>{
+                  if(err){
+                    console.log(err);
+                  }
+                  else{
+                    try {
+                      const newSub = await Submission.create({
+                        name: subName,
+                        feedback: null,
+                        grade: null,
+                        courseName: courseName,
+                        assName: assName,
+                        studentID: user._id,
+                        studentName: user.name,
+                        FileName: filename
+                      })
+                      var q = User.findById(user._id);
+                      q.exec(async(err, user1) => {
+                        var subs = [];
+                        subs = user1.submissions;
+                       // console.log(subs);
+                        subs.push(newSub._id);
+                        User.findByIdAndUpdate(user1._id, {
+                          $set: {
+                            submissions: subs
+                          }
+                        }, (err) => {
+                          if (err) 
+                            console.log(err)
+                          else{
+                            console.log("successfully uploaded");
+                            mongoose.disconnect();
+                            process.exit();
+                            return;
+                          }
+                        });
+                      })
+                    } catch (error) {
+                      console.log(err);
+                    }
+                  }
+                })
+                //console.log(path);
+                //console.log(__dirname);
+                //f2(courseName,assName,path,fileName,url);
                 //f(path);
               }
             })
