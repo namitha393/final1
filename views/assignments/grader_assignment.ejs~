@@ -88,6 +88,7 @@
     <tr class="">
     <th class="cell c0" style="" scope="row">No of students</th>
     <td class="cell c1 lastcol" style=""><%=students%></td>
+    console.log(students);
     </tr>
     <tr class="">
     <th class="cell c0" style="" scope="row">Submitted</th>
@@ -108,7 +109,7 @@
                 <div class="card">
                     <div class="card-body">
                         <div >
-                            <% var mean=sum/students %>
+                            
                             <% sum=0 %>
                             <% sumsq =0 %>
                             
@@ -130,8 +131,8 @@
                           <div>
                           	
                           	<div class="means">
-                          		<label for="mean">Mean of marks of students: <%= mean %> </label> <br>     
-                          		<label for="varience">Varience of marks of students: <%= sumsq-(mean)*(mean) %> </label> <br>    
+                          		<label for="mean">Mean of marks of students: <%= sum/students %> </label> <br>     
+                          		<label for="varience">Varience of marks of students: <%= sumsq-(sum/students)*(sum/students) %> </label> <br>    
                           	</div>
                           </div>            
                     

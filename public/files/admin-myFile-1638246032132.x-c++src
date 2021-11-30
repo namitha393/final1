@@ -1,0 +1,42 @@
+#include<iostream>
+using namespace std;
+
+
+int main(){
+int t;
+cin>>t;
+int sum=0;
+
+int n[t],k[t];
+
+for(int i=0;i<t;i++){
+	cin>>n[i]>>k[i];
+	sum+=n[i];
+}
+if(sum<=2000000 && t<=100000 && t>=1){
+for(int i=0;i<t;i++){
+	if(n[i]>=k[i] && k[i]>=0 && n[i]>=1 && n[i]<=100000){
+	if(n[i]-k[i]==1){cout<<-1<<endl;}
+	if(n[i]==k[i]){
+	for(int j=0;j<n[i];j++){
+		cout<<j+1<<" ";
+	}
+	}
+	else{	
+		for(int j=0;j<k[i];j++){
+			cout<<j+1<<" ";
+		}
+		for(int j=k[i];j<n[i]-1;j++){
+			cout<<j+2<<" ";
+		}
+		cout<<k[i]+1<<endl;
+		
+		
+			
+		
+	}
+}
+}
+}
+}
+		

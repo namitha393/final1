@@ -1,0 +1,133 @@
+<%- include('../partials/header') %>
+
+    <html lang="en" dir="ltr" style="
+    margin-top: 40px;
+    margin-right: 300px;
+    text-align: center;
+">
+
+<head>
+  <style>
+    body {
+      font-family: "Lato", sans-serif;
+    }
+    
+    .sidenav {
+      height: 100%;
+      width: 0;
+      position: fixed;
+      z-index: 1;
+      top: 0;
+      left: 0;
+      background-color: #111;
+      overflow-x: hidden;
+      transition: 0.5s;
+      padding-top: 60px;
+    }
+    
+    .sidenav a {
+      padding: 8px 8px 8px 32px;
+      text-decoration: none;
+      font-size: 25px;
+      color: #818181;
+      display: block;
+      transition: 0.3s;
+    }
+    
+    .sidenav a:hover {
+      color: #f1f1f1;
+    }
+    
+    .sidenav .closebtn {
+      position: absolute;
+      top: 0;
+      right: 25px;
+      font-size: 36px;
+      margin-left: 50px;
+    }
+    
+    @media screen and (max-height: 450px) {
+      .sidenav {padding-top: 15px;}
+      .sidenav a {font-size: 18px;}
+    }
+    </style>
+</head>
+
+<div class="container" style="padding-left: 0px;margin-left: 20px;">
+  <span style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776;</span>
+
+
+
+  
+
+</div>
+
+<br>
+
+
+
+<h3 style="text-align: center;">Grading summary</h3><div class="box py-3 boxaligncenter gradingsummarytable">
+	<p class="card-text">CourseName:<%=courseName%></p>
+    <p class="card-text">Total Grade till date (0-10): <%=total%></p>
+                    
+<br>
+
+<% subs.forEach(sub=>{ %>
+                               
+                                <%if(sub.grade!=null) grade=sub.grade %>
+                                
+                                <%if(sub.feedback!=null) feed=sub.feedback %>
+                                <div class="form-group">
+                                    <label for="name">Assignment Name:<%=sub.assName%></label><br>
+                                   
+                                     <label for="grade">Grade: <%=grade%> </label> <br>
+                                     <label for="feedback">Feedback: <%=feed%> </label>
+                                </div>
+                            <% }) %>  
+	                      
+</div>
+
+</div>
+                
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+<br>
+<div style="padding-left: 450px">
+
+
+   
+
+
+
+
+
+
+
+
+
+<script>
+  function openNav() {
+    document.getElementById("mySidenav").style.width = "250px";
+  }
+  
+  function closeNav() {
+    document.getElementById("mySidenav").style.width = "0";
+  }
+  </script>
+     
+
+
+
+
+
+
+
+
+
+
+
+
+<%- include('../partials/footer') %>
