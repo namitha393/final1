@@ -1,1 +1,1 @@
-web: bundle exec ruby app.rb -p $PORT
+$ echo "web: node app.js" > Procfile
