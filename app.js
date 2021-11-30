@@ -171,7 +171,7 @@ app.post("/:Role/editProfile", (req, res) => {
   User.findOneAndUpdate({
     "_id": req.user._id
   }, {
-    $set: {student//grade
+    $set: {student,//grade
       "name": req.body.name,
       "username": req.body.username
     }
@@ -719,7 +719,56 @@ app.get("/instructor/courses/:courseName/assignments/:assName", (req, res) => {
   })
 
 })
-app.get("/student/:courseName/grades , (req,res)=> {
+app.get("/student/:courseName/grades" , (req,res)=> {
+	 if (!req.isAuthenticated()) {
+    		return res.redirect("/login");
+  	}
+  	
+      var courseName = req.params.courseName;
+      var course=Course.findOne({name:courseName});
+      User.findById(req.user._id,(err,user)=>{
+        var n2 = console.log(user.name);
+    	var sc=user.SCourses;
+    sc.forEach(obj=>{
+      Course.findOne({name:courseName},(err,course)=>{
+        if(err){
+          console.log(err);
+        }
+        else{
+          var ass=obj.ass;
+          ass.forEach(obj2=>{
+          Assignment.findById(obj2.assID,(err,ass1)=>{
+            var assName = ass1.nameofA;
+            var weightage=ass1.weightage;
+            Submission.findOne({
+            courseName: req.params.courseName,
+            assName:assName,
+            studentID: req.user._id
+          },(err,sub1)=>{
+          
+            if(err){
+              console.log(err);
+            }
+            else{
+         	var grade = sub1.grade;
+          }
+          
+        }
+        )
+        var total = weightage * grade ;
+        console.log(total);
+        })
+        
+        })
+        }
+        })
+        })
+        })
+        })
+       
+        
+        
+  	
 	
 app.get("/ta/courses/:courseName/assignments/:assName", (req, res) => {
   if (!req.isAuthenticated()) {
